@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,16 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				jansunwayi: {
+					saffron: '#FF671F',
+					white: '#FFFFFF',
+					green: '#046A38',
+					blue: '#1E40AF',
+					navy: '#0F2A59',
+					gray: '#F3F4F6',
+					darkgray: '#4B5563',
+					red: '#EF4444'
 				}
 			},
 			borderRadius: {
