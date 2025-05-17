@@ -4,7 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { format, isWithinDays } from 'date-fns';
+import { format, differenceInDays, addDays } from 'date-fns';
 import { toast } from 'sonner';
 
 // Mock data
@@ -55,6 +55,15 @@ const DepartmentPage: React.FC = () => {
   const totalCases = cases.length;
   const resolvedCases = cases.filter(c => c.status === 'Resolved').length;
   const pendingCases = totalCases - resolvedCases;
+  
+  // Helper function to check if a date is within specified days from now
+  const isWithinDays = (date: Date, daysCount: number): boolean => {
+    if (!date) return false;
+    const now = new Date();
+    const diffTime = date.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays >= 0 && diffDays <= daysCount;
+  };
   
   const sendReminder = (caseId: string) => {
     toast.success(
