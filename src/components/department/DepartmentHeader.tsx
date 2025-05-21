@@ -1,7 +1,5 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { TranslationType } from '@/utils/departmentUtils';
 
 interface DepartmentHeaderProps {
@@ -15,11 +13,6 @@ const DepartmentHeader: React.FC<DepartmentHeaderProps> = ({ title, t }) => {
       <h1 className="text-2xl font-bold text-jansunwayi-navy">
         {t.title} - {title}
       </h1>
-      <Link to="/add-case">
-        <Button className="btn-primary">
-          {t.addNewCase}
-        </Button>
-      </Link>
     </div>
   );
 };

@@ -7,7 +7,6 @@ import SubDepartments from '@/components/department/SubDepartments';
 import CaseSummary from '@/components/department/CaseSummary';
 import CasesTable from '@/components/department/CasesTable';
 import { 
-  generateMockCases, 
   departments, 
   subDepartments, 
   translations,
@@ -24,10 +23,31 @@ const DepartmentPage: React.FC = () => {
   
   useEffect(() => {
     if (id) {
-      setCases(generateMockCases(Number(id)));
+      // We're no longer generating cases here as they are now generated per sub-department
       setShowSubDepartments(Number(id) === 1);
     }
   }, [id]);
+  
+  // Calculate total cases across all sub-departments for this department
+  const departmentSubDepts = subDepartments.filter(subDept => 
+    // For the example, we'll associate all sub-departments with department ID 1
+    Number(id) === 1
+  );
+  
+  let allCases: CaseType[] = [];
+  departmentSubDepts.forEach(subDept => {
+    allCases = [...allCases, ...subDepartments.map(sd => ({ 
+      id: `CASE-${subDept.id}-${Math.floor(Math.random() * 100)}`,
+      date: new Date(),
+      status: Math.random() > 0.5 ? 'Resolved' as const : 'Pending' as const,
+      hearingDate: new Date(Date.now() + Math.random() * 1000 * 60 * 60 * 24 * 14),
+      name: `Case for ${currentLang === 'en' ? subDept.name_en : subDept.name_hi}`
+    }))];
+  });
+  
+  useEffect(() => {
+    setCases(allCases);
+  }, [id, currentLang]);
   
   const totalCases = cases.length;
   const resolvedCases = cases.filter(c => c.status === 'Resolved').length;
