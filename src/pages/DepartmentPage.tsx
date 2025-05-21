@@ -35,14 +35,16 @@ const DepartmentPage: React.FC = () => {
   );
   
   let allCases: CaseType[] = [];
-  departmentSubDepts.forEach(subDept => {
-    allCases = [...allCases, ...subDepartments.map(sd => ({ 
-      id: `CASE-${subDept.id}-${Math.floor(Math.random() * 100)}`,
+  departmentSubDepts.forEach((subDept, subDeptIndex) => {
+    // Generate unique cases for each sub-department
+    const subDeptCases = Array(5).fill(null).map((_, caseIndex) => ({ 
+      id: `CASE-${subDept.id}-${caseIndex}`, // Ensure unique IDs
       date: new Date(),
       status: Math.random() > 0.5 ? 'Resolved' as const : 'Pending' as const,
       hearingDate: new Date(Date.now() + Math.random() * 1000 * 60 * 60 * 24 * 14),
       name: `Case for ${currentLang === 'en' ? subDept.name_en : subDept.name_hi}`
-    }))];
+    }));
+    allCases = [...allCases, ...subDeptCases];
   });
   
   useEffect(() => {

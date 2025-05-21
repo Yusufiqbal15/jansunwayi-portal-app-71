@@ -24,7 +24,7 @@ export const generateMockCases = (departmentId: number) => {
     hearingDate.setDate(today.getDate() + Math.floor(Math.random() * 14));
     
     return {
-      id: `CASE-${departmentId}-${100 + index}`,
+      id: `CASE-${departmentId}-${index}`, // Ensure unique IDs
       date: caseDate,
       status,
       hearingDate: status === 'Pending' ? hearingDate : null,
@@ -76,7 +76,8 @@ export const translations = {
     viewDetails: "View Details",
     addNewCase: "Add New Case",
     subDepartments: "Sub Departments",
-    viewSubDepartment: "View"
+    viewSubDepartment: "View",
+    recentCases: "Recent Cases"
   },
   hi: {
     title: "विभागीय रिपोर्ट",
@@ -94,7 +95,8 @@ export const translations = {
     viewDetails: "विवरण देखें",
     addNewCase: "नया मामला जोड़ें",
     subDepartments: "उप विभाग",
-    viewSubDepartment: "देखें"
+    viewSubDepartment: "देखें",
+    recentCases: "हाल के मामले"
   }
 };
 
