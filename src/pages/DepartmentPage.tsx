@@ -4,7 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { format, differenceInDays, addDays } from 'date-fns';
+import { format, isWithinDays } from 'date-fns';
 import { toast } from 'sonner';
 
 // Mock data
@@ -30,10 +30,26 @@ const generateMockCases = (departmentId: number) => {
   });
 };
 
+// Sub-departments for Administration Department
+const subDepartments = [
+  { id: 101, name_en: "Chief Development Officer", name_hi: "मुख्य विकास अधिकारी" },
+  { id: 102, name_en: "Additional District Magistrate (Finance / Revenue) Ayodhya", name_hi: "अपर जिलाधिकारी (वित्त / राजस्व) अयोध्या" },
+  { id: 103, name_en: "Additional District Magistrate (City), Ayodhya", name_hi: "अपर जिलाधिकारी (नगर), अयोध्या" },
+  { id: 104, name_en: "Additional District Magistrate (Administration)", name_hi: "अपर जिलाधिकारी (प्रशासन)" },
+  { id: 105, name_en: "Chief Revenue Officer", name_hi: "मुख्य राजस्व अधिकारी" },
+  { id: 106, name_en: "Additional District Magistrate (Land / 310)", name_hi: "अपर जिलाधिकारी (भू / 310)" },
+  { id: 107, name_en: "Additional District Magistrate (Land-220)", name_hi: "अपर जिलाधिकारी (भू—220)" },
+  { id: 108, name_en: "City Magistrate", name_hi: "नगर मजिस्ट्रेट" },
+  { id: 109, name_en: "Resident Magistrate", name_hi: "रेजीडेन्ट मजिस्ट्रेट" },
+  { id: 110, name_en: "Deputy Divisional Consolidation", name_hi: "उप संभागीय चकबन्दी" },
+  { id: 111, name_en: "Sub Divisional Magistrate Sadar", name_hi: "उप जिलाधिकारी सदर" },
+];
+
 const DepartmentPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { currentLang } = useApp();
   const [cases, setCases] = useState<any[]>([]);
+  const [showSubDepartments, setShowSubDepartments] = useState<boolean>(Number(id) === 1);
   
   const departments = [
     { id: 1, name_en: "Administration Department", name_hi: "प्रशासन विभाग" },
@@ -49,6 +65,7 @@ const DepartmentPage: React.FC = () => {
   useEffect(() => {
     if (id) {
       setCases(generateMockCases(Number(id)));
+      setShowSubDepartments(Number(id) === 1);
     }
   }, [id]);
   
@@ -57,12 +74,12 @@ const DepartmentPage: React.FC = () => {
   const pendingCases = totalCases - resolvedCases;
   
   // Helper function to check if a date is within specified days from now
-  const isWithinDays = (date: Date, daysCount: number): boolean => {
+  const isWithinDays = (date: Date, days: number): boolean => {
     if (!date) return false;
     const now = new Date();
     const diffTime = date.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays >= 0 && diffDays <= daysCount;
+    return diffDays >= 0 && diffDays <= days;
   };
   
   const sendReminder = (caseId: string) => {
@@ -88,7 +105,9 @@ const DepartmentPage: React.FC = () => {
       pending: "Pending",
       resolved: "Resolved",
       viewDetails: "View Details",
-      addNewCase: "Add New Case"
+      addNewCase: "Add New Case",
+      subDepartments: "Sub Departments",
+      viewSubDepartment: "View"
     },
     hi: {
       title: "विभागीय रिपोर्ट",
@@ -104,7 +123,9 @@ const DepartmentPage: React.FC = () => {
       pending: "लंबित",
       resolved: "निराकृत",
       viewDetails: "विवरण देखें",
-      addNewCase: "नया मामला जोड़ें"
+      addNewCase: "नया मामला जोड़ें",
+      subDepartments: "उप विभाग",
+      viewSubDepartment: "देखें"
     }
   };
   
@@ -122,6 +143,31 @@ const DepartmentPage: React.FC = () => {
           </Button>
         </Link>
       </div>
+      
+      {/* Show sub-departments for Administration Department (id: 1) */}
+      {showSubDepartments && (
+        <>
+          <h2 className="text-xl font-semibold mb-4 text-jansunwayi-navy">
+            {t.subDepartments}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {subDepartments.map((subDept) => (
+              <Card key={subDept.id} className="hover:shadow-lg transition-shadow">
+                <div className="p-4">
+                  <h3 className="text-lg font-medium mb-2">
+                    {currentLang === 'hi' ? subDept.name_hi : subDept.name_en}
+                  </h3>
+                  <div className="flex justify-end">
+                    <Button variant="outline" size="sm">
+                      {t.viewSubDepartment}
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </>
+      )}
       
       {/* Summary cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -172,7 +218,7 @@ const DepartmentPage: React.FC = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {cases.map((c) => {
-                const needsReminder = c.status === 'Pending' && c.hearingDate && isWithinDays(c.hearingDate, new Date(), 7);
+                const needsReminder = c.status === 'Pending' && c.hearingDate && isWithinDays(c.hearingDate, 7);
                 
                 return (
                   <tr key={c.id} className={needsReminder ? 'bg-red-50' : ''}>
