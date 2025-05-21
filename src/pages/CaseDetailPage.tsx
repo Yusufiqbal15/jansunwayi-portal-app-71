@@ -117,7 +117,7 @@ const CaseDetailPage: React.FC = () => {
       upcomingHearing: "Upcoming Hearing",
       saved: "Changes saved successfully",
       deleted: "Case deleted successfully",
-      reminderSent: "Reminder sent successfully"
+      reminderSentSuccess: "Reminder sent successfully"
     },
     hi: {
       title: "मामले का विवरण",
@@ -151,7 +151,7 @@ const CaseDetailPage: React.FC = () => {
       upcomingHearing: "आगामी सुनवाई",
       saved: "परिवर्तन सफलतापूर्वक सहेजे गए",
       deleted: "मामला सफलतापूर्वक हटा दिया गया है",
-      reminderSent: "अनुस्मारक सफलतापूर्वक भेजा गया"
+      reminderSentSuccess: "अनुस्मारक सफलतापूर्वक भेजा गया"
     }
   };
   
@@ -201,7 +201,7 @@ const CaseDetailPage: React.FC = () => {
       ...prev,
       reminderSent: true
     }));
-    toast.success(t.reminderSent);
+    toast.success(t.reminderSentSuccess);
   };
   
   const isWithin7Days = (date: Date) => {
