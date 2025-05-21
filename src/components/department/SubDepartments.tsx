@@ -93,10 +93,10 @@ const SubDepartments: React.FC<SubDepartmentsProps> = ({ subDepartments, current
                       <ul className="space-y-2">
                         {subDeptCases.slice(0, 3).map((caseItem) => (
                           <li key={caseItem.id} className="text-sm">
-                            <span className="inline-block px-2 py-1 rounded-full text-xs mr-2 
-                              {caseItem.status === 'Resolved' 
+                            <span className={`inline-block px-2 py-1 rounded-full text-xs mr-2 
+                              ${caseItem.status === 'Resolved' 
                                 ? 'bg-green-100 text-green-800' 
-                                : 'bg-yellow-100 text-yellow-800'}">
+                                : 'bg-yellow-100 text-yellow-800'}`}>
                               {caseItem.status === 'Resolved' ? t.resolved : t.pending}
                             </span>
                             {caseItem.name}
