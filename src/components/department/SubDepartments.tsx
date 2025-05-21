@@ -4,16 +4,19 @@ import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { 
+import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger 
+  CollapsibleTrigger
 } from '@/components/ui/collapsible';
-import { 
-  TranslationType, 
+import {
+  TranslationType,
   CaseType,
-  generateMockCases 
+  generateMockCases
 } from '@/utils/departmentUtils';
+import { toast } from 'sonner';
+import { format } from 'date-fns';
+import { isWithinDays } from '@/utils/departmentUtils';
 
 interface SubDepartment {
   id: number;
@@ -37,6 +40,20 @@ const SubDepartments: React.FC<SubDepartmentsProps> = ({ subDepartments, current
       [id]: !prev[id]
     }));
   };
+
+  const sendReminder = (caseId: string) => {
+    toast.success(
+      currentLang === 'en'
+        ? `Reminder sent for case ${caseId}`
+        : `मामला ${caseId} के लिए अनुस्मारक भेजा गया`
+    );
+  };
+
+  // Calculate totals for all sub-departments
+  const allCases = subDepartments.flatMap(subDept => generateMockCases(subDept.id));
+  const totalCases = allCases.length;
+  const resolvedCases = allCases.filter(c => c.status === 'Resolved').length;
+  const pendingCases = totalCases - resolvedCases;
 
   return (
     <>
@@ -90,19 +107,70 @@ const SubDepartments: React.FC<SubDepartmentsProps> = ({ subDepartments, current
                   <CollapsibleContent>
                     <div className="pt-3 border-t mt-3">
                       <h4 className="font-medium mb-2">{t.recentCases}</h4>
-                      <ul className="space-y-2">
-                        {subDeptCases.slice(0, 3).map((caseItem) => (
-                          <li key={caseItem.id} className="text-sm">
-                            <span className={`inline-block px-2 py-1 rounded-full text-xs mr-2 
-                              ${caseItem.status === 'Resolved' 
-                                ? 'bg-green-100 text-green-800' 
-                                : 'bg-yellow-100 text-yellow-800'}`}>
-                              {caseItem.status === 'Resolved' ? t.resolved : t.pending}
-                            </span>
-                            {caseItem.name}
-                          </li>
-                        ))}
-                      </ul>
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full">
+                          <thead className="bg-gray-50">
+                            <tr>
+                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                {t.caseId}
+                              </th>
+                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                {t.status}
+                              </th>
+                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                {t.hearingDate}
+                              </th>
+                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                {t.actions}
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200">
+                            {subDeptCases.map((caseItem) => {
+                              const needsReminder = caseItem.status === 'Pending' && caseItem.hearingDate && isWithinDays(caseItem.hearingDate, 7);
+                              
+                              return (
+                                <tr key={caseItem.id} className={needsReminder ? 'bg-red-50' : ''}>
+                                  <td className="px-3 py-2 whitespace-nowrap">
+                                    <div className="text-xs font-medium text-gray-900">{caseItem.id}</div>
+                                  </td>
+                                  <td className="px-3 py-2 whitespace-nowrap">
+                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                      caseItem.status === 'Pending' 
+                                        ? 'bg-yellow-100 text-yellow-800' 
+                                        : 'bg-green-100 text-green-800'
+                                    }`}>
+                                      {currentLang === 'en' ? caseItem.status : (caseItem.status === 'Pending' ? t.pending : t.resolved)}
+                                    </span>
+                                  </td>
+                                  <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-500">
+                                    {caseItem.hearingDate ? format(caseItem.hearingDate, 'yyyy-MM-dd') : '-'}
+                                  </td>
+                                  <td className="px-3 py-2 whitespace-nowrap text-xs font-medium">
+                                    <div className="flex space-x-2">
+                                      <Link to={`/case/${caseItem.id}`}>
+                                        <Button variant="outline" size="sm">
+                                          {t.viewDetails}
+                                        </Button>
+                                      </Link>
+                                      
+                                      {needsReminder && (
+                                        <Button 
+                                          variant="destructive" 
+                                          size="sm" 
+                                          onClick={() => sendReminder(caseItem.id)}
+                                        >
+                                          {t.sendReminder}
+                                        </Button>
+                                      )}
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   </CollapsibleContent>
                   
@@ -121,6 +189,30 @@ const SubDepartments: React.FC<SubDepartmentsProps> = ({ subDepartments, current
             </Collapsible>
           );
         })}
+      </div>
+      
+      {/* Add summary cards for total cases */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <Card className="bg-jansunwayi-blue text-white">
+          <div className="p-6 text-center">
+            <h3 className="text-lg font-semibold mb-2">{t.totalCases}</h3>
+            <p className="text-3xl font-bold">{totalCases}</p>
+          </div>
+        </Card>
+        
+        <Card className="bg-jansunwayi-green text-white">
+          <div className="p-6 text-center">
+            <h3 className="text-lg font-semibold mb-2">{t.resolvedCases}</h3>
+            <p className="text-3xl font-bold">{resolvedCases}</p>
+          </div>
+        </Card>
+        
+        <Card className="bg-jansunwayi-saffron text-white">
+          <div className="p-6 text-center">
+            <h3 className="text-lg font-semibold mb-2">{t.pendingCases}</h3>
+            <p className="text-3xl font-bold">{pendingCases}</p>
+          </div>
+        </Card>
       </div>
     </>
   );
