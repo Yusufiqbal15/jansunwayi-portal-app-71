@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Bell } from 'lucide-react';
@@ -15,7 +14,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage
   
   const translations = {
     en: {
-      title: "DM Jansunwayi Portal",
+      title: "Ayodhya Court Case Portal",
       home: "Home",
       reports: "Reports",
       logout: "Logout",
@@ -38,9 +37,9 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <img 
-              src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" 
-              alt="Emblem of India" 
-              className="h-10 w-auto" 
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Seal_of_Uttar_Pradesh.svg/640px-Seal_of_Uttar_Pradesh.svg.png" 
+              alt="Uttar Pradesh logo" 
+              className="h-20 w-auto" 
             />
             <h1 className="text-xl md:text-2xl font-bold">{t.title}</h1>
           </div>

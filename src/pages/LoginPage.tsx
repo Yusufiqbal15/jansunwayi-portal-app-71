@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
@@ -16,7 +15,7 @@ const LoginPage: React.FC = () => {
   
   const translations = {
     en: {
-      title: "DM Jansunwayi Portal",
+      title: "Ayodhya Court Case Portal",
       subtitle: "Login to access the portal",
       emailPlaceholder: "Email / Phone number",
       passwordPlaceholder: "Password",
