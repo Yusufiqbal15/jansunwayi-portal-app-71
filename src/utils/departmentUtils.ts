@@ -67,6 +67,21 @@ export const departments = [
   { id: 31, name_en: "U.P. Jal Nigam Urban Construction Division", name_hi: "उ0 प्र0 जल निगम नगरीय निर्माण खण्ड" },
   { id: 32, name_en: "Minor Irrigation Division Ayodhya", name_hi: "लघु सिंचाई खण्ड अयोध्या" },
   { id: 33, name_en: "Electricity Department", name_hi: "विद्युत विभाग" },
+  { id: 34, name_en: "ITI Department", name_hi: "आई0टी0आई0 विभाग" },
+  { id: 35, name_en: "State Tax Department", name_hi: "राज्य कर विभाग" },
+  { id: 36, name_en: "Police Department", name_hi: "पुलिस विभाग" },
+  { id: 37, name_en: "Education Department", name_hi: "शिक्षा विभाग" },
+  { id: 38, name_en: "Divisional Transport Department", name_hi: "सम्भागीय परिवहन विभाग " },
+  { id: 39, name_en: "Uttar Pradesh State Road Transport Department", name_hi: "उ0 प्र0 राज्य सड़क परिवहन विभाग" },
+  { id: 40, name_en: "Information Department", name_hi: "सूचना विभाग " },
+  { id: 41, name_en: "Home Guards Department", name_hi: "होम गार्ड्स विभाग" },
+  { id: 42, name_en: "Health Department", name_hi: "स्वास्थ्य विभाग" },
+  { id: 43, name_en: "Stamp and Registration Department", name_hi: "स्टाम्प एवं रजिस्ट्रेशन विभाग" },
+  { id: 44, name_en: "Ayodhya Development Authority Ayodhya", name_hi: "अयोध्या विकास प्राधिकरण अयोध्या" },
+  { id: 45, name_en: "Public Works Department Electrical & Mechanical Section", name_hi: "लोक निर्माण विभाग विद्युत यांत्रिक खण्ड" },
+  { id: 46, name_en: "Cooperative Department", name_hi: "सहकारिता विभाग" },
+  { id: 47, name_en: "UPPCL U.P. Project Corporation Ltd. Construction Unit-11 Ayodhya", name_hi: "यूपीपीसीएल उ0 प्र0 प्रोजेक्ट कारपोरेशन लि0 निर्माण इकाई-11 अयोध्या।" },
+  { id: 48, name_en: "Other Miscellaneous Departments", name_hi: "अन्य विविध विभाग" },
 
 
 

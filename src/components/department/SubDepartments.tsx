@@ -79,9 +79,6 @@ const SubDepartments: React.FC<SubDepartmentsProps> = ({ subDepartments, current
             {t.addNewCase}
           </Button>
         </Link>
-        <Button className="btn-primary ml-2" onClick={handleAddSubDepartment}>
-          Add Sub Department
-        </Button>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
