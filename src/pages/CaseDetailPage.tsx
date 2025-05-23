@@ -19,6 +19,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 
 // Mock data for demonstration
 const getMockCase = (id: string) => {
@@ -46,6 +48,8 @@ const getMockCase = (id: string) => {
     reminderSent: false,
     affidavitDueDate,
     affidavitSubmissionDate: null,
+    counterAffidavitRequired: false,
+    reminderSentCount: 0,
   };
 };
 
@@ -58,6 +62,9 @@ const CaseDetailPage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState<any>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const [reminderEmail, setReminderEmail] = useState('');
+  const [sending, setSending] = useState(false);
   
   useEffect(() => {
     // In a real app, you would fetch this from the backend
@@ -76,12 +83,54 @@ const CaseDetailPage: React.FC = () => {
   ];
   
   const departments = [
-    { id: '1', name_en: "Administration Department", name_hi: "प्रशासन विभाग" },
-    { id: '2', name_en: "Finance Department", name_hi: "वित्त विभाग" },
-    { id: '3', name_en: "Law Department", name_hi: "क़ानून विभाग" },
-    { id: '4', name_en: "Chief Revenue Officer", name_hi: "मुख्य राजस्व अधिकारी" },
-    { id: '5', name_en: "City Magistrate", name_hi: "नगर मजिस्ट्रेट" },
-    { id: '6', name_en: "SDM Sadar", name_hi: "SDM सदर" },
+    { id: 1, name_en: "Administration Department", name_hi: "प्रशासन विभाग" },
+    { id: 2, name_en: "Development department", name_hi: "विकास विभाग" },
+    { id: 3, name_en: "District Panchayat Department", name_hi: "जिला पंचायत विभाग" },
+    { id: 4, name_en: "District Social Welfare Department", name_hi: "जिला समाज कल्याण विभाग" },
+    { id: 5, name_en: "Animal Husbandry Department", name_hi: "पशुपालन विभाग" },
+    { id: 6, name_en: "District Industries Department", name_hi: "जिला उद्योग विभाग" },
+    { id: 7, name_en: "District Education Department", name_hi: "जिला शिक्षा विभाग" },
+    { id: 8, name_en: "District Health Department", name_hi: "जिला स्वास्थ्य विभाग" },
+    { id: 9, name_en: "District Agriculture Department", name_hi: "जिला कृषि विभाग" },
+    { id: 10, name_en: "District Forest Department", name_hi: "जिला वन विभाग" },
+    { id: 11, name_en: "District Program Department", name_hi: "जिला कार्यक्रम विभाग" },
+    { id: 12, name_en: "District Food and Marketing Department", name_hi: "जिला खाद्य एवं विपणन विभाग" },
+    { id: 13, name_en: "District Food Logistics Department", name_hi: "जिला खाद्य रसद विभाग" },
+    { id: 14, name_en: "Agriculture Department", name_hi: "कृषि विभाग" },
+    { id: 15, name_en: "Sugarcan Department", name_hi: "गन्ना विभाग" },
+    { id: 16, name_en: "Agricultural Production Market Committee", name_hi: "कृषि उत्पादन मंडी समिति" },
+    { id: 17, name_en: "labor department", name_hi: "श्रम विभाग" },
+    { id: 18, name_en: "Excise Department", name_hi: "आबकारी विभाग" },
+    { id: 19, name_en: "irrigation department", name_hi: "सिंचाई विभाग" },
+    { id: 20, name_en: "Public Works Department, Provincial Division", name_hi: "लोक निर्माण विभाग, प्रान्तीय खण्ड" },
+    { id: 21, name_en: "Public Works Department Construction Division-02", name_hi: "लोक निर्माण विभाग निर्माण खण्ड-02" },
+    { id: 22, name_en: "Public Works Department Construction Division-03", name_hi: "लोक निर्माण विभाग निर्माण खण्ड-03" },
+    { id: 23, name_en: "Public Works Department Division-04", name_hi: "लोक निर्माण विभाग खण्ड-04" },
+    { id: 24, name_en: "Public Works Department NH (National Highway) Division", name_hi: "लोक निर्माण विभाग एन0एच0 खण्ड" },
+    { id: 25, name_en: "Rural Engineering Department (R.E.D.)", name_hi: "ग्रामीण अभियंत्रण विभाग (आर०ई०डी०)" },
+    { id: 26, name_en: "Saryu Canal Division", name_hi: "सरयू नहर खण्ड" },
+    { id: 27, name_en: "Flood Works Division", name_hi: "बाढ़ कार्य खण्ड" },
+    { id: 28, name_en: "Groundwater Department", name_hi: "भूगर्भ जल विभाग"},
+    { id: 29, name_en: "Lift Irrigation Division", name_hi: "लिफ्ट सिंचाई खण्ड" },
+    { id: 30, name_en: "Tubewell Construction Division", name_hi: "नलकूप निर्माण खण्ड" },
+    { id: 31, name_en: "U.P. Jal Nigam Urban Construction Division", name_hi: "उ0 प्र0 जल निगम नगरीय निर्माण खण्ड" },
+    { id: 32, name_en: "Minor Irrigation Division Ayodhya", name_hi: "लघु सिंचाई खण्ड अयोध्या" },
+    { id: 33, name_en: "Electricity Department", name_hi: "विद्युत विभाग" },
+    { id: 34, name_en: "ITI Department", name_hi: "आई0टी0आई0 विभाग" },
+    { id: 35, name_en: "State Tax Department", name_hi: "राज्य कर विभाग" },
+    { id: 36, name_en: "Police Department", name_hi: "पुलिस विभाग" },
+    { id: 37, name_en: "Education Department", name_hi: "शिक्षा विभाग" },
+    { id: 38, name_en: "Divisional Transport Department", name_hi: "सम्भागीय परिवहन विभाग " },
+    { id: 39, name_en: "Uttar Pradesh State Road Transport Department", name_hi: "उ0 प्र0 राज्य सड़क परिवहन विभाग" },
+    { id: 40, name_en: "Information Department", name_hi: "सूचना विभाग " },
+    { id: 41, name_en: "Home Guards Department", name_hi: "होम गार्ड्स विभाग" },
+    { id: 42, name_en: "Health Department", name_hi: "स्वास्थ्य विभाग" },
+    { id: 43, name_en: "Stamp and Registration Department", name_hi: "स्टाम्प एवं रजिस्ट्रेशन विभाग" },
+    { id: 44, name_en: "Ayodhya Development Authority Ayodhya", name_hi: "अयोध्या विकास प्राधिकरण अयोध्या" },
+    { id: 45, name_en: "Public Works Department Electrical & Mechanical Section", name_hi: "लोक निर्माण विभाग विद्युत यांत्रिक खण्ड" },
+    { id: 46, name_en: "Cooperative Department", name_hi: "सहकारिता विभाग" },
+    { id: 47, name_en: "UPPCL U.P. Project Corporation Ltd. Construction Unit-11 Ayodhya", name_hi: "यूपीपीसीएल उ0 प्र0 प्रोजेक्ट कारपोरेशन लि0 निर्माण इकाई-11 अयोध्या।" },
+    { id: 48, name_en: "Other Miscellaneous Departments", name_hi: "अन्य विविध विभाग" },
   ];
   
   const translations = {
@@ -99,6 +148,7 @@ const CaseDetailPage: React.FC = () => {
       reminderSent: "Reminder Sent 1 Week Prior",
       affidavitDueDate: "Due Date to Submit Affidavit",
       affidavitSubmissionDate: "Affidavit Submission Date",
+      isthecounteraffidavittobefiledornot: " Is The Counter-Affidavit to be filed or not?",
       edit: "Edit",
       delete: "Delete",
       save: "Save Changes",
@@ -133,6 +183,7 @@ const CaseDetailPage: React.FC = () => {
       reminderSent: "एक सप्ताह पूर्व स्मारक भेजा गया?",
       affidavitDueDate: "प्रतिसपथ पत्र दाखिल करने हेतु निर्धारित तिथि",
       affidavitSubmissionDate: "प्रतिसपथ पत्र दाखिल होने की तिथि",
+      isthecounteraffidavittobefiledornot:"प्रतिशपथ पत्र पत्र दाखिल होना है या नहीं ?",
       edit: "संपादित करें",
       delete: "हटाएं",
       save: "सहेजें परिवर्तन",
@@ -179,6 +230,13 @@ const CaseDetailPage: React.FC = () => {
     }));
   };
   
+  const handleCounterAffidavitToggle = () => {
+    setEditedData((prev: any) => ({
+      ...prev,
+      counterAffidavitRequired: !prev.counterAffidavitRequired
+    }));
+  };
+  
   const handleSave = () => {
     // In a real app, you would save this to the backend
     setCaseData(editedData);
@@ -192,16 +250,28 @@ const CaseDetailPage: React.FC = () => {
     navigate('/dashboard');
   };
   
-  const sendReminder = () => {
+  const sendReminder = async () => {
+    setShowEmailDialog(true);
+  };
+  
+  const handleSendEmail = async () => {
+    setSending(true);
+    // Mock sending email (replace with real API call)
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setSending(false);
+    setShowEmailDialog(false);
+    setReminderEmail('');
+    toast.success(`${t.reminderSentSuccess} (${reminderEmail})`);
     setCaseData((prev: any) => ({
       ...prev,
-      reminderSent: true
+      reminderSent: true,
+      reminderSentCount: (prev.reminderSentCount || 0) + 1
     }));
     setEditedData((prev: any) => ({
       ...prev,
-      reminderSent: true
+      reminderSent: true,
+      reminderSentCount: (prev.reminderSentCount || 0) + 1
     }));
-    toast.success(t.reminderSentSuccess);
   };
   
   const isWithin7Days = (date: Date) => {
@@ -562,10 +632,16 @@ const CaseDetailPage: React.FC = () => {
                 >
                   {t.no}
                 </Button>
+                <span className="ml-4 text-xs text-gray-500">
+                  {currentLang === 'hi' ? `भेजा गया: ${editedData.reminderSentCount || 0} बार` : `Sent: ${editedData.reminderSentCount || 0} times`}
+                </span>
               </div>
             ) : (
-              <div className="px-3 py-2 border border-gray-200 rounded-md bg-gray-50">
-                {caseData.reminderSent ? t.yes : t.no}
+              <div className="px-3 py-2 border border-gray-200 rounded-md bg-gray-50 flex items-center justify-between">
+                <span>{caseData.reminderSent ? t.yes : t.no}</span>
+                <span className="ml-4 text-xs text-gray-500">
+                  {currentLang === 'hi' ? `भेजा गया: ${caseData.reminderSentCount || 0} बार` : `Sent: ${caseData.reminderSentCount || 0} times`}
+                </span>
               </div>
             )}
           </div>
@@ -643,6 +719,36 @@ const CaseDetailPage: React.FC = () => {
               </div>
             )}
           </div>
+          
+          <div className="flex items-center space-x-2">
+            <label className="text-sm font-medium">
+              {t.isthecounteraffidavittobefiledornot}
+            </label>
+            <div className="flex items-center space-x-4">
+              <button
+                type="button"
+                onClick={handleCounterAffidavitToggle}
+                className={`px-4 py-2 rounded-md ${
+                  editedData.counterAffidavitRequired
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gray-200 text-gray-700'
+                }`}
+              >
+                {t.yes}
+              </button>
+              <button
+                type="button"
+                onClick={handleCounterAffidavitToggle}
+                className={`px-4 py-2 rounded-md ${
+                  !editedData.counterAffidavitRequired
+                    ? 'bg-red-500 text-white'
+                    : 'bg-gray-200 text-gray-700'
+                }`}
+              >
+                {t.no}
+              </button>
+            </div>
+          </div>
         </div>
       </Card>
       
@@ -662,6 +768,35 @@ const CaseDetailPage: React.FC = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Email Dialog for Reminder */}
+      <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{currentLang === 'hi' ? 'ईमेल पता दर्ज करें' : 'Enter Email Address'}</DialogTitle>
+            <DialogDescription>
+              {currentLang === 'hi'
+                ? 'कृपया वह ईमेल पता दर्ज करें जिस पर आप रिमाइंडर भेजना चाहते हैं।'
+                : 'Please enter the email address where you want to send the reminder.'}
+            </DialogDescription>
+          </DialogHeader>
+          <Input
+            type="email"
+            placeholder={currentLang === 'hi' ? 'ईमेल पता' : 'Email address'}
+            value={reminderEmail}
+            onChange={e => setReminderEmail(e.target.value)}
+            disabled={sending}
+          />
+          <DialogFooter>
+            <Button onClick={handleSendEmail} disabled={sending || !reminderEmail}>
+              {sending ? (currentLang === 'hi' ? 'भेजा जा रहा है...' : 'Sending...') : (currentLang === 'hi' ? 'भेजें' : 'Send')}
+            </Button>
+            <Button variant="outline" onClick={() => setShowEmailDialog(false)} disabled={sending}>
+              {currentLang === 'hi' ? 'रद्द करें' : 'Cancel'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
@@ -33,6 +32,7 @@ interface SubDepartmentsProps {
 const SubDepartments: React.FC<SubDepartmentsProps> = ({ subDepartments, currentLang, t }) => {
   // Track which sub-departments are open
   const [openSubDepts, setOpenSubDepts] = useState<Record<number, boolean>>({});
+  const [newSubDeptName, setNewSubDeptName] = useState('');
 
   const toggleSubDept = (id: number) => {
     setOpenSubDepts(prev => ({
@@ -47,6 +47,19 @@ const SubDepartments: React.FC<SubDepartmentsProps> = ({ subDepartments, current
         ? `Reminder sent for case ${caseId}`
         : `मामला ${caseId} के लिए अनुस्मारक भेजा गया`
     );
+  };
+
+  const handleAddSubDepartment = () => {
+    const name = prompt('Enter the name of the sub-department:');
+    if (name) {
+      const newSubDept = {
+        id: subDepartments.length + 1,
+        name_en: name,
+        name_hi: name
+      };
+      subDepartments.push(newSubDept);
+      setNewSubDeptName(name);
+    }
   };
 
   // Calculate totals for all sub-departments
@@ -175,14 +188,11 @@ const SubDepartments: React.FC<SubDepartmentsProps> = ({ subDepartments, current
                   </CollapsibleContent>
                   
                   <div className="flex justify-end mt-2">
-                    <Button variant="outline" size="sm" 
-                      onClick={(e) => {
-                        e.stopPropagation(); // Prevent triggering the collapsible
-                        // View sub-department action
-                      }}
-                    >
-                      {t.viewSubDepartment}
-                    </Button>
+                    <Link to={`/sub-department/${subDept.id}`}>
+                      <Button variant="outline" size="sm">
+                        {t.viewSubDepartment}
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </Card>
