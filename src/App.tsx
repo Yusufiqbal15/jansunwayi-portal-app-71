@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,6 +11,7 @@ import DepartmentPage from "./pages/DepartmentPage";
 import AddCasePage from "./pages/AddCasePage";
 import CaseDetailPage from "./pages/CaseDetailPage";
 import NotFound from "./pages/NotFound";
+import SubDepartmentPage from '@/pages/SubDepartmentPage';
 
 const queryClient = new QueryClient();
 
@@ -29,6 +29,7 @@ const App = () => (
             <Route path="/" element={<Layout requireAuth />}>
               <Route path="dashboard" element={<DashboardPage />} />
               <Route path="department/:id" element={<DepartmentPage />} />
+              <Route path="sub-department/:id" element={<SubDepartmentPage />} />
               <Route path="add-case" element={<AddCasePage />} />
               <Route path="case/:id" element={<CaseDetailPage />} />
             </Route>
