@@ -46,16 +46,16 @@ A modern, multi-language portal for managing government department cases, built 
 ## 📸 Screenshots
 
 ### Department List
-![Department List](.image3.png)
+![Department List](./screenshots/department-list.png)
 
 ### Department Report & Sub Departments
-![Department Report](.image2.png)
+![Department Report](./screenshots/department-report.png)
 
 ### Sub Department - Recent Cases & Stats
-![Sub Department Cases](.image1.png)
+![Sub Department Cases](./screenshots/subdepartment-cases.png)
 
 ### Login Page
-![Login Page](.image.png)
+![Login Page](./screenshots/login-page.png)
 
 > _All UI is fully responsive and supports both English and Hindi!_
 
