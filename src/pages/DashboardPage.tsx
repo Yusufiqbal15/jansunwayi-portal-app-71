@@ -107,7 +107,7 @@ const DashboardPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredDepartments.map((dept) => (
           <Link to={`/department/${dept.id}`} key={dept.id}>
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <Card className="bg-White-500 transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 ...">
               <div className="p-6">
                 <h2 className="text-xl font-semibold mb-2">
                   {currentLang === 'hi' ? dept.name_hi : dept.name_en}

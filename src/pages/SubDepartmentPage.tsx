@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Card } from '@/components/ui/card';
@@ -8,24 +8,50 @@ import { format } from 'date-fns';
 import { generateMockCases, translations, isWithinDays } from '@/utils/departmentUtils';
 import { subDepartments } from '@/utils/departmentUtils';
 import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 
 const SubDepartmentPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { currentLang } = useApp();
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const [reminderEmail, setReminderEmail] = useState('');
+  const [sending, setSending] = useState(false);
+  const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
   
   const subDepartment = subDepartments.find(subDept => subDept.id === Number(id));
   const cases = generateMockCases(Number(id));
   
   const t = translations[currentLang];
 
-  const sendReminder = (caseId: string) => {
+  const validateEmail = (email: string) => {
+    return /\S+@\S+\.\S+/.test(email);
+  };
+
+  const handleSendReminderClick = (caseId: string) => {
+    setSelectedCaseId(caseId);
+    setShowEmailDialog(true);
+  };
+
+  const handleSendEmail = async () => {
+    if (!validateEmail(reminderEmail)) {
+      toast.error(currentLang === 'hi' ? 'कृपया मान्य ईमेल पता दर्ज करें।' : 'Please enter a valid email address.');
+      return;
+    }
+    setSending(true);
+    // Mock sending email (replace with real API call)
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setSending(false);
+    setShowEmailDialog(false);
     toast.success(
       currentLang === 'en'
-        ? `Reminder sent for case ${caseId}`
-        : `मामला ${caseId} के लिए अनुस्मारक भेजा गया`
+        ? `Reminder sent for case ${selectedCaseId} to ${reminderEmail}`
+        : `मामला ${selectedCaseId} के लिए अनुस्मारक ${reminderEmail} पर भेजा गया`
     );
+    setReminderEmail('');
+    setSelectedCaseId(null);
   };
-  
+
   if (!subDepartment) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -143,7 +169,7 @@ const SubDepartmentPage: React.FC = () => {
                           <Button 
                             variant="destructive" 
                             size="sm" 
-                            onClick={() => sendReminder(caseItem.id)}
+                            onClick={() => handleSendReminderClick(caseItem.id)}
                           >
                             {t.sendReminder}
                           </Button>
@@ -157,6 +183,34 @@ const SubDepartmentPage: React.FC = () => {
           </table>
         </div>
       </Card>
+      {/* Email Dialog for Reminder */}
+      <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{currentLang === 'hi' ? 'ईमेल पता दर्ज करें' : 'Enter Email Address'}</DialogTitle>
+            <DialogDescription>
+              {currentLang === 'hi'
+                ? 'कृपया वह ईमेल पता दर्ज करें जिस पर आप रिमाइंडर भेजना चाहते हैं।'
+                : 'Please enter the email address where you want to send the reminder.'}
+            </DialogDescription>
+          </DialogHeader>
+          <Input
+            type="email"
+            placeholder={currentLang === 'hi' ? 'ईमेल पता' : 'Email address'}
+            value={reminderEmail}
+            onChange={e => setReminderEmail(e.target.value)}
+            disabled={sending}
+          />
+          <DialogFooter>
+            <Button onClick={handleSendEmail} disabled={sending || !reminderEmail}>
+              {sending ? (currentLang === 'hi' ? 'भेजा जा रहा है...' : 'Sending...') : (currentLang === 'hi' ? 'भेजें' : 'Send')}
+            </Button>
+            <Button variant="outline" onClick={() => setShowEmailDialog(false)} disabled={sending}>
+              {currentLang === 'hi' ? 'रद्द करें' : 'Cancel'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

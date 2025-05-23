@@ -1,11 +1,12 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CaseType, TranslationType, isWithinDays } from '@/utils/departmentUtils';
 import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 
 interface CasesTableProps {
   cases: CaseType[];
@@ -14,12 +15,37 @@ interface CasesTableProps {
 }
 
 const CasesTable: React.FC<CasesTableProps> = ({ cases, currentLang, t }) => {
-  const sendReminder = (caseId: string) => {
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const [reminderEmail, setReminderEmail] = useState('');
+  const [sending, setSending] = useState(false);
+  const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
+
+  const validateEmail = (email: string) => {
+    return /\S+@\S+\.\S+/.test(email);
+  };
+
+  const handleSendReminderClick = (caseId: string) => {
+    setSelectedCaseId(caseId);
+    setShowEmailDialog(true);
+  };
+
+  const handleSendEmail = async () => {
+    if (!validateEmail(reminderEmail)) {
+      toast.error(currentLang === 'hi' ? 'कृपया मान्य ईमेल पता दर्ज करें।' : 'Please enter a valid email address.');
+      return;
+    }
+    setSending(true);
+    // Mock sending email (replace with real API call)
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setSending(false);
+    setShowEmailDialog(false);
     toast.success(
-      currentLang === 'en' 
-        ? `Reminder sent for case ${caseId}` 
-        : `मामला ${caseId} के लिए अनुस्मारक भेजा गया`
+      currentLang === 'en'
+        ? `Reminder sent for case ${selectedCaseId} to ${reminderEmail}`
+        : `मामला ${selectedCaseId} के लिए अनुस्मारक ${reminderEmail} पर भेजा गया`
     );
+    setReminderEmail('');
+    setSelectedCaseId(null);
   };
 
   return (
@@ -83,7 +109,7 @@ const CasesTable: React.FC<CasesTableProps> = ({ cases, currentLang, t }) => {
                         <Button 
                           variant="destructive" 
                           size="sm" 
-                          onClick={() => sendReminder(c.id)}
+                          onClick={() => handleSendReminderClick(c.id)}
                         >
                           {t.sendReminder}
                         </Button>
@@ -96,6 +122,34 @@ const CasesTable: React.FC<CasesTableProps> = ({ cases, currentLang, t }) => {
           </tbody>
         </table>
       </div>
+      {/* Email Dialog for Reminder */}
+      <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{currentLang === 'hi' ? 'ईमेल पता दर्ज करें' : 'Enter Email Address'}</DialogTitle>
+            <DialogDescription>
+              {currentLang === 'hi'
+                ? 'कृपया वह ईमेल पता दर्ज करें जिस पर आप रिमाइंडर भेजना चाहते हैं।'
+                : 'Please enter the email address where you want to send the reminder.'}
+            </DialogDescription>
+          </DialogHeader>
+          <Input
+            type="email"
+            placeholder={currentLang === 'hi' ? 'ईमेल पता' : 'Email address'}
+            value={reminderEmail}
+            onChange={e => setReminderEmail(e.target.value)}
+            disabled={sending}
+          />
+          <DialogFooter>
+            <Button onClick={handleSendEmail} disabled={sending || !reminderEmail}>
+              {sending ? (currentLang === 'hi' ? 'भेजा जा रहा है...' : 'Sending...') : (currentLang === 'hi' ? 'भेजें' : 'Send')}
+            </Button>
+            <Button variant="outline" onClick={() => setShowEmailDialog(false)} disabled={sending}>
+              {currentLang === 'hi' ? 'रद्द करें' : 'Cancel'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
