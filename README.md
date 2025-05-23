@@ -1,73 +1,131 @@
-# Welcome to your Lovable project
+# Ayodhya Court Case Portal
 
-## Project info
+A modern, multi-language portal for managing government department cases, built with React, TypeScript, Vite, shadcn-ui, and Tailwind CSS.
 
-**URL**: https://lovable.dev/projects/40028f2a-895c-4ebf-bb27-f5bedf042caa
+---
 
-## How can I edit this code?
+## 🚀 Features
 
-There are several ways of editing your application.
+- **Department Dashboard:**
+  - Browse, search, and filter all departments with a beautiful, responsive UI.
+- **Sub-Departments & Case Management:**
+  - View sub-departments, recent cases, and detailed case information.
+- **Case Actions:**
+  - Add new cases
+  - Edit case details
+  - Send reminders (with email prompt)
+  - Multi-language support (English & Hindi)
+- **Advanced UI/UX:**
+  - Smooth transitions and hover effects
+  - Modern cards, dialogs, and tables
+  - Toast notifications for user feedback
+- **Accessibility & Mobile Ready:**
+  - Fully responsive and accessible design.
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/40028f2a-895c-4ebf-bb27-f5bedf042caa) and start prompting.
+## 🛠️ Tech Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=FFD62E)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![shadcn/ui](https://img.shields.io/badge/shadcn--ui-111827?style=for-the-badge)
 
-**Use your preferred IDE**
+- [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vitejs.dev/)
+- [shadcn/ui](https://ui.shadcn.com/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Radix UI](https://www.radix-ui.com/)
+- [React Router](https://reactrouter.com/)
+- [date-fns](https://date-fns.org/)
+- [sonner](https://sonner.emilkowal.ski/)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 📸 Screenshots
 
-Follow these steps:
+### Department List
+![Department List](./screenshots/department-list.png)
+
+### Department Report & Sub Departments
+![Department Report](./screenshots/department-report.png)
+
+### Sub Department - Recent Cases & Stats
+![Sub Department Cases](./screenshots/subdepartment-cases.png)
+
+### Login Page
+![Login Page](./screenshots/login-page.png)
+
+> _All UI is fully responsive and supports both English and Hindi!_
+
+---
+
+## 🖥️ Getting Started
+
+### Prerequisites
+- Node.js (v18+ recommended)
+- npm
+
+### Installation
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# 1. Clone the repository
 git clone <YOUR_GIT_URL>
+cd jansunwayi-portal-app-71
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# 2. Install dependencies
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# 3. Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Visit [http://localhost:5173](http://localhost:5173) to view the app.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## 📂 Project Structure
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```
+src/
+  components/         # Reusable UI and feature components
+    department/       # Department and sub-department components
+    ui/               # UI primitives (Card, Button, Dialog, etc.)
+  contexts/           # React context providers
+  hooks/              # Custom React hooks
+  lib/                # Utility libraries
+  pages/              # Main app pages (Dashboard, Department, Case Details, etc.)
+  utils/              # Utility functions and translations
+public/               # Static assets (favicon, images)
+```
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## 🤝 Contributing
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+1. Fork this repo
+2. Create your feature branch (`git checkout -b feature/YourFeature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin feature/YourFeature`)
+5. Create a new Pull Request
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/40028f2a-895c-4ebf-bb27-f5bedf042caa) and click on Share -> Publish.
+## 📄 License
 
-## Can I connect a custom domain to my Lovable project?
+This project is open source and available under the [MIT License](LICENSE).
 
-Yes, you can!
+---
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 🙏 Acknowledgements
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- [shadcn/ui](https://ui.shadcn.com/)
+- [Radix UI](https://www.radix-ui.com/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Vite](https://vitejs.dev/)
+- [React](https://react.dev/)
+
+---
+
+> _Made with ❤️ for government transparency and efficiency!_ 
