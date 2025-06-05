@@ -58,6 +58,7 @@ const DashboardPage: React.FC = () => {
     { id: 46, name_en: "Cooperative Department", name_hi: "सहकारिता विभाग" },
     { id: 47, name_en: "UPPCL U.P. Project Corporation Ltd. Construction Unit-11 Ayodhya", name_hi: "यूपीपीसीएल उ0 प्र0 प्रोजेक्ट कारपोरेशन लि0 निर्माण इकाई-11 अयोध्या।" },
     { id: 48, name_en: "Other Miscellaneous Departments", name_hi: "अन्य विविध विभाग" },
+    { id: 49, name_en: "Nagar Nigam Ayodhya", name_hi: "नगर निगम अयोध्या" },
   ];
   
   const translations = {

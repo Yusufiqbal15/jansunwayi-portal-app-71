@@ -21,6 +21,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import ReportsPage from './pages/ReportsPage';
+import { useQueryClient } from '@tanstack/react-query';
+import { fetchCases } from '@/lib/api';
 
 // Mock data for demonstration
 const getMockCase = (id: string) => {
@@ -57,6 +60,7 @@ const CaseDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { currentLang } = useApp();
+  const queryClient = useQueryClient();
   
   const [caseData, setCaseData] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -67,7 +71,6 @@ const CaseDetailPage: React.FC = () => {
   const [sending, setSending] = useState(false);
   
   useEffect(() => {
-    // In a real app, you would fetch this from the backend
     if (id) {
       const mockCase = getMockCase(id);
       setCaseData(mockCase);
@@ -165,6 +168,7 @@ const CaseDetailPage: React.FC = () => {
       sendReminder: "Send Reminder",
       hearingPending: "Hearing Pending",
       upcomingHearing: "Upcoming Hearing",
+      counterAffidavitinstruction: "Counter Affidavit (instruction)",
       saved: "Changes saved successfully",
       deleted: "Case deleted successfully",
       reminderSentSuccess: "Reminder sent successfully"
@@ -200,6 +204,7 @@ const CaseDetailPage: React.FC = () => {
       sendReminder: "भेजें अनुस्मारक",
       hearingPending: "सुनवाई लंबित",
       upcomingHearing: "आगामी सुनवाई",
+      counterAffidavitinstruction: "प्रतिसपथ पत्र (आदेश)",
       saved: "परिवर्तन सफलतापूर्वक सहेजे गए",
       deleted: "मामला सफलतापूर्वक हटा दिया गया है",
       reminderSentSuccess: "अनुस्मारक सफलतापूर्वक भेजा गया"
@@ -238,15 +243,15 @@ const CaseDetailPage: React.FC = () => {
   };
   
   const handleSave = () => {
-    // In a real app, you would save this to the backend
     setCaseData(editedData);
     setIsEditing(false);
     toast.success(t.saved);
+    queryClient.invalidateQueries({ queryKey: ['cases'] });
   };
   
   const handleDelete = () => {
-    // In a real app, you would delete this from the backend
     toast.success(t.deleted);
+    queryClient.invalidateQueries({ queryKey: ['cases'] });
     navigate('/dashboard');
   };
   
@@ -256,22 +261,12 @@ const CaseDetailPage: React.FC = () => {
   
   const handleSendEmail = async () => {
     setSending(true);
-    // Mock sending email (replace with real API call)
     await new Promise((resolve) => setTimeout(resolve, 1000));
     setSending(false);
     setShowEmailDialog(false);
     setReminderEmail('');
     toast.success(`${t.reminderSentSuccess} (${reminderEmail})`);
-    setCaseData((prev: any) => ({
-      ...prev,
-      reminderSent: true,
-      reminderSentCount: (prev.reminderSentCount || 0) + 1
-    }));
-    setEditedData((prev: any) => ({
-      ...prev,
-      reminderSent: true,
-      reminderSentCount: (prev.reminderSentCount || 0) + 1
-    }));
+    queryClient.invalidateQueries({ queryKey: ['cases'] });
   };
   
   const isWithin7Days = (date: Date) => {
@@ -720,33 +715,39 @@ const CaseDetailPage: React.FC = () => {
             )}
           </div>
           
-          <div className="flex items-center space-x-2">
-            <label className="text-sm font-medium">
-              {t.isthecounteraffidavittobefiledornot}
+          {/* Counter Affidavit Section */}
+          <div className="col-span-full">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t.counterAffidavitinstruction}
             </label>
-            <div className="flex items-center space-x-4">
-              <button
-                type="button"
-                onClick={handleCounterAffidavitToggle}
-                className={`px-4 py-2 rounded-md ${
-                  editedData.counterAffidavitRequired
-                    ? 'bg-green-500 text-white'
-                    : 'bg-gray-200 text-gray-700'
-                }`}
-              >
-                {t.yes}
-              </button>
-              <button
-                type="button"
-                onClick={handleCounterAffidavitToggle}
-                className={`px-4 py-2 rounded-md ${
-                  !editedData.counterAffidavitRequired
-                    ? 'bg-red-500 text-white'
-                    : 'bg-gray-200 text-gray-700'
-                }`}
-              >
-                {t.no}
-              </button>
+            <div className="flex items-center space-x-2">
+              <label className="text-sm font-medium">
+                {t.isthecounteraffidavittobefiledornot}
+              </label>
+              <div className="flex items-center space-x-4">
+                <button
+                  type="button"
+                  onClick={handleCounterAffidavitToggle}
+                  className={`px-4 py-2 rounded-md ${
+                    editedData.counterAffidavitRequired
+                      ? 'bg-green-500 text-white'
+                      : 'bg-gray-200 text-gray-700'
+                  }`}
+                >
+                  {t.yes}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCounterAffidavitToggle}
+                  className={`px-4 py-2 rounded-md ${
+                    !editedData.counterAffidavitRequired
+                      ? 'bg-red-500 text-white'
+                      : 'bg-gray-200 text-gray-700'
+                  }`}
+                >
+                  {t.no}
+                </button>
+              </div>
             </div>
           </div>
         </div>
