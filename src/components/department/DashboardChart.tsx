@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchCases, Case } from '@/lib/api';
+import SubDepartmentData from './SubDepartmentData';
 
-// Full departments array (copy from CaseDetailPage.tsx)
+
 const departments = [
   { id: 1, name_en: "Administration Department", name_hi: "प्रशासन विभाग" },
   { id: 2, name_en: "Development department", name_hi: "विकास विभाग" },
@@ -71,6 +72,7 @@ type Props = {
 };
 
 const DashboardChart: React.FC<Props> = ({ currentLang }) => {
+  const [selectedDeptId, setSelectedDeptId] = useState<number | null>(null);
   const navigate = useNavigate();
 
   // Use react-query to fetch cases
@@ -78,20 +80,35 @@ const DashboardChart: React.FC<Props> = ({ currentLang }) => {
     queryKey: ['cases'],       // Unique key for this query
     queryFn: fetchCases,      // Function to fetch the data
     staleTime: 5 * 60 * 1000, // Data is considered "fresh" for 5 minutes
-    cacheTime: 10 * 60 * 1000, // Data stays in cache for 10 minutes
+   
   });
 
   const handleClick = (departmentId: number, status: 'total' | 'pending' | 'resolved') => {
     navigate(`/cases?department=${departmentId}&status=${status}`);
   };
 
+  // Show SubDepartmentData only for Administration Department (id: 1)
+  if (selectedDeptId === 1) {
+    return (
+      <div>
+        <button
+          onClick={() => setSelectedDeptId(null)}
+          className="mb-4 px-4 py-2 bg-blue-600 text-white rounded"
+        >
+          {currentLang === 'hi' ? 'वापस' : 'Back'}
+        </button>
+        <SubDepartmentData />
+      </div>
+    );
+  }
+
   if (isLoading) {
-    return <div className="text-center">Loading reports...</div>;
+    return <div className="text-center py-8 text-blue-700 font-semibold">Loading reports...</div>;
   }
 
   if (error) {
     console.error("Error fetching cases:", error);
-    return <div className="text-center text-red-500">Error loading reports.</div>;
+    return <div className="text-center py-8 text-red-500 font-semibold">Error loading reports.</div>;
   }
 
   return (
@@ -119,27 +136,46 @@ const DashboardChart: React.FC<Props> = ({ currentLang }) => {
             // Calculate stats based on the fetched 'cases' data
             const stats = getDepartmentStats(dept.id, cases);
             return (
-              <tr
-                key={dept.id}
-                className="transition-all duration-200 hover:scale-[1.01] hover:shadow-md hover:bg-blue-50"
-              >
+              <tr key={dept.id} className="transition-all duration-200 hover:scale-[1.01] hover:shadow-md hover:bg-blue-50">
                 <td className="p-3 text-center rounded-l-lg">{idx + 1}</td>
-                <td className="p-3">{currentLang === 'hi' ? dept.name_hi : dept.name_en}</td>
+                <td
+
+className="p-3 font-semibold cursor-pointer text-black hover:text-gray-800"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setSelectedDeptId(dept.id)}
+                  onKeyPress={e => { if (e.key === 'Enter') setSelectedDeptId(dept.id); }}
+                  title={currentLang === 'hi' ? 'विभाग के आँकड़े देखें' : 'View department stats'}
+                >
+                  {currentLang === 'hi' ? dept.name_hi : dept.name_en}
+                </td>
                 <td
                   className="p-3 text-center font-bold text-blue-700 bg-blue-100 rounded cursor-pointer hover:underline"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => handleClick(dept.id, 'total')}
+                  onKeyPress={e => { if (e.key === 'Enter') handleClick(dept.id, 'total'); }}
+                  title={currentLang === 'hi' ? 'कुल मामले देखें' : 'View total cases'}
                 >
                   {stats.total}
                 </td>
                 <td
                   className="p-3 text-center font-bold text-yellow-700 bg-yellow-100 rounded cursor-pointer hover:underline"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => handleClick(dept.id, 'pending')}
+                  onKeyPress={e => { if (e.key === 'Enter') handleClick(dept.id, 'pending'); }}
+                  title={currentLang === 'hi' ? 'लंबित मामले देखें' : 'View pending cases'}
                 >
                   {stats.pending}
                 </td>
                 <td
                   className="p-3 text-center font-bold text-green-700 bg-green-100 rounded-r-lg cursor-pointer hover:underline"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => handleClick(dept.id, 'resolved')}
+                  onKeyPress={e => { if (e.key === 'Enter') handleClick(dept.id, 'resolved'); }}
+                  title={currentLang === 'hi' ? 'निराकृत मामले देखें' : 'View resolved cases'}
                 >
                   {stats.resolved}
                 </td>
@@ -152,4 +188,4 @@ const DashboardChart: React.FC<Props> = ({ currentLang }) => {
   );
 };
 
-export default DashboardChart; 
+export default DashboardChart;

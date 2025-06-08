@@ -1,18 +1,19 @@
 import React from 'react';
 import { useApp } from '@/contexts/AppContext';
 import DashboardChart from '@/components/department/DashboardChart';
+import Header from '@/components/Header';
 
 const ReportsPage: React.FC = () => {
-  const { currentLang } = useApp();
+  const { currentLang, isLoggedIn, toggleLanguage } = useApp();
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">
-        {currentLang === 'hi' ? 'रिपोर्ट' : 'Reports'}
-      </h1>
-      <DashboardChart currentLang={currentLang} />
+      {isLoggedIn && (
+        <Header isLoggedIn={isLoggedIn} currentLang={currentLang} toggleLanguage={toggleLanguage} />
+      )}
+      <div className='pt-20'><DashboardChart currentLang={currentLang} /></div>
     </div>
   );
 };
 
-export default ReportsPage; 
+export default ReportsPage;

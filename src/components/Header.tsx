@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+
 interface HeaderProps {
   isLoggedIn: boolean;
   currentLang: 'en' | 'hi';
@@ -11,7 +12,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage }) => {
   const [notifications, setNotifications] = useState(3);
-  
+
   const translations = {
     en: {
       title: "Ayodhya Court Case Portal",
@@ -28,22 +29,62 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage
       login: "लॉगिन"
     }
   };
-  
+
   const t = translations[currentLang];
-  
+
   return (
-    <header className="bg-jansunwayi-blue text-white shadow-md">
+    <header className="fixed top-0 left-0 w-full z-50 bg-blue-700 text-white shadow-md">
       <div className="container mx-auto px-4 py-3">
         <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-2">
+          
+          {/* Logo and Title with Navigation */}
+          <div className="flex items-center space-x-4">
             <img 
-              src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Seal_of_Uttar_Pradesh.svg/640px-Seal_of_Uttar_Pradesh.svg.png" 
+              src="/logo.jpg"
               alt="Uttar Pradesh logo" 
+             style={{ borderRadius: '40px ' }}
               className="h-20 w-auto" 
             />
-            <h1 className="text-xl md:text-2xl font-bold">{t.title}</h1>
+            <div>
+              <h1 className="text-xl md:text-2xl font-bold">{t.title}</h1>
+              {isLoggedIn && (
+                <nav className="mt-1">
+                  <ul className="flex space-x-4 text-sm md:text-base">
+                    <li>
+                      <Link to="/dashboard" className="hover:text-jansunwayi-gray bx1 transition-colors">
+                        {t.home}
+                      </Link>
+                    </li>
+                    <li className="relative group">
+                      <button
+                        className="hover:text-jansunwayi-gray transition-colors focus:outline-none"
+                      >
+                        {t.reports}
+                      </button>
+                      <ul className="absolute left-0 mt-2 w-48 bg-white text-jansunwayi-blue rounded shadow-lg opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity z-10">
+                        <li>
+                          <Link
+                            to="/reports"
+                            className="block px-4 py-2 hover:bg-blue-500 hover:text-white transition-colors"
+                          >
+                            Department Report
+                          </Link>
+                        </li>
+                        
+                      </ul>
+                    </li>
+                    <li>
+                      <Link to="/" className="hover:text-jansunwayi-gray  transition-colors">
+                        {t.logout}
+                      </Link>
+                    </li>
+                  </ul>
+                </nav>
+              )}
+            </div>
           </div>
-          
+
+          {/* Notification & Language Toggle */}
           <div className="flex items-center space-x-4">
             {isLoggedIn && (
               <div className="relative">
@@ -55,9 +96,11 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage
                     </span>
                   )}
                 </Button>
+
               </div>
             )}
-            
+
+            {/* Language Toggle */}
             <div className="language-toggle border rounded-md overflow-hidden">
               <button 
                 className={`px-2 py-1 ${currentLang === 'en' ? 'bg-white text-jansunwayi-blue' : 'bg-transparent text-white'}`}
@@ -74,28 +117,6 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage
             </div>
           </div>
         </div>
-        
-        {isLoggedIn && (
-          <nav className="mt-2">
-            <ul className="flex space-x-4">
-              <li>
-                <Link to="/dashboard" className="hover:text-jansunwayi-gray transition-colors">
-                  {t.home}
-                </Link>
-              </li>
-              <li>
-                <Link to="/reports" className="hover:text-jansunwayi-gray transition-colors">
-                  {t.reports}
-                </Link>
-              </li>
-              <li>
-                <Link to="/" className="hover:text-jansunwayi-gray transition-colors">
-                  {t.logout}
-                </Link>
-              </li>
-            </ul>
-          </nav>
-        )}
       </div>
     </header>
   );

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 type User = {
@@ -11,6 +10,7 @@ type AppContextType = {
   currentLang: 'en' | 'hi';
   toggleLanguage: () => void;
   user: User | null;
+  isLoggedIn: boolean; // <-- Add this line
   login: (email: string, password: string, role: 'admin' | 'user') => void;
   logout: () => void;
 };
@@ -43,6 +43,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     currentLang,
     toggleLanguage,
     user,
+    isLoggedIn: !!user, // <-- Add this line
     login,
     logout,
   };
