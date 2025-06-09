@@ -70,8 +70,8 @@ const SubDepartments: React.FC<SubDepartmentsProps> = ({ subDepartments, current
 
   return (
     <>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-jansunwayi-navy">
+      <div className="  flex justify-between items-center mb-4">
+        <h2 className=" text-xl font-semibold text-jansunwayi-navy">
           {t.subDepartments}
         </h2>
         <Link to="/add-case">

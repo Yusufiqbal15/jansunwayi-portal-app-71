@@ -11,7 +11,7 @@ const ReportsPage: React.FC = () => {
       {isLoggedIn && (
         <Header isLoggedIn={isLoggedIn} currentLang={currentLang} toggleLanguage={toggleLanguage} />
       )}
-      <div className='pt-20'><DashboardChart currentLang={currentLang} /></div>
+      <div ><DashboardChart currentLang={currentLang} /></div>
     </div>
   );
 };

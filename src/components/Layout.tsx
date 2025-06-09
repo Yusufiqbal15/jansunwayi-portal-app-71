@@ -24,10 +24,11 @@ const Layout: React.FC<LayoutProps> = ({ requireAuth = false }) => {
         currentLang={currentLang}
         toggleLanguage={toggleLanguage}
       />
-      <main className="flex-1 container mx-auto px-4 py-6">
+      <main className="flex-1 container mx-auto px-20 py-6">
         <Outlet />
       </main>
-      <Footer currentLang={currentLang} />
+      <Footer currentLang={currentLang} 
+    />
     </div>
   );
 };

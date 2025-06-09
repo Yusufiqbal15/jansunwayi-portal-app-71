@@ -33,7 +33,7 @@ const CaseStatsTable = ({ departmentId, currentLang, onBack }: { departmentId: n
     {/* ...other content... */}
     <button
       onClick={onBack}
-      className="fixed right-8 bottom-8 px-4 py-2 bg-blue-600 text-white rounded shadow-lg z-50 font-bold"
+      className="fixed right-8 bottom-83 pl-4 px-4 py-2 bg-blue-600 text-white rounded shadow-lg z-50 font-bold"
       style={{ minWidth: 100, zIndex: 1000, marginBottom: '80px' /* adjust if needed */ }}
     >
       {currentLang === 'hi' ? 'वापस' : 'Back'}
@@ -44,7 +44,7 @@ const CaseStatsTable = ({ departmentId, currentLang, onBack }: { departmentId: n
 const SubDepartmentData = ({ isLoggedIn = true }: { isLoggedIn?: boolean }) => {
   return (
     <div>
-      {isLoggedIn && <Header isLoggedIn={true} currentLang="en" toggleLanguage={() => {}} />}
+      
       <div className="overflow-x-auto p-4 font-bold">
         <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
           <thead>

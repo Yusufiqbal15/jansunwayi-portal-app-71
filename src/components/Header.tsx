@@ -19,7 +19,8 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage
       home: "Home",
       reports: "Reports",
       logout: "Logout",
-      login: "Login"
+      login: "Login",
+      Print: "Print"
     },
     hi: {
       title: "डीएम जनसुनवाई पोर्टल",
@@ -33,7 +34,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage
   const t = translations[currentLang];
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-blue-700 text-white shadow-md">
+    <header className=" top-0 left-0 w-full z-50 bg-blue-700 text-white shadow-md">
       <div className="container mx-auto px-4 py-3">
         <div className="flex justify-between items-center">
           
@@ -77,6 +78,26 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage
                       <Link to="/" className="hover:text-jansunwayi-gray  transition-colors">
                         {t.logout}
                       </Link>
+                    </li>
+                    <li>
+                      <button
+                        type="button"
+                        className="hover:text-jansunwayi-gray transition-colors focus:outline-none"
+                        onClick={() => {
+                          // Create a blank PDF and trigger download
+                          const doc = new window.Blob([' '], { type: 'application/pdf' });
+                          const url = window.URL.createObjectURL(doc);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = 'blank.pdf';
+                          document.body.appendChild(a);
+                          a.click();
+                          document.body.removeChild(a);
+                          window.URL.revokeObjectURL(url);
+                        }}
+                      >
+                        {t.Print}
+                      </button>
                     </li>
                   </ul>
                 </nav>

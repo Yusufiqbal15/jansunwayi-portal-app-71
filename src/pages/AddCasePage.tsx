@@ -291,19 +291,14 @@ const AddCasePage: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t.writType}
               </label>
-              <select
+              <input
+                type="text"
                 name="writType"
                 value={formData.writType}
                 onChange={handleChange}
                 className="input-field"
-              >
-                <option value="">{t.selectWritType}</option>
-                {writTypes.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {currentLang === 'hi' ? type.name_hi : type.name_en}
-                  </option>
-                ))}
-              </select>
+                placeholder={t.selectWritType}
+              />
             </div>
             
             {/* Department */}
