@@ -164,7 +164,48 @@ const SubDepartmentPage: React.FC = () => {
                             {t.viewDetails}
                           </Button>
                         </Link>
-                        
+
+                        {/* Print Button */}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            // Minimal valid blank PDF content
+                            const pdfData = `%PDF-1.1
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] >>
+endobj
+xref
+0 4
+0000000000 65535 f 
+0000000010 00000 n 
+0000000061 00000 n 
+0000000116 00000 n 
+trailer
+<< /Root 1 0 R /Size 4 >>
+startxref
+178
+%%EOF`;
+                            const blob = new Blob([pdfData], { type: 'application/pdf' });
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'blank.pdf';
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            window.URL.revokeObjectURL(url);
+                          }}
+                        >
+                          {currentLang === 'hi' ? 'प्रिंट' : 'Print'}
+                        </Button>
+
                         {needsReminder && (
                           <Button 
                             variant="destructive" 
@@ -215,4 +256,4 @@ const SubDepartmentPage: React.FC = () => {
   );
 };
 
-export default SubDepartmentPage; 
+export default SubDepartmentPage;

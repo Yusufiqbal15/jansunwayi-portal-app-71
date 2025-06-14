@@ -96,7 +96,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage
                           window.URL.revokeObjectURL(url);
                         }}
                       >
-                        {t.Print}
+                        
                       </button>
                     </li>
                   </ul>
