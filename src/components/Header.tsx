@@ -16,16 +16,17 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage
   const translations = {
     en: {
       title: "Ayodhya Court Case Portal",
-      home: "Home",
+      
       reports: "Reports",
+      home: "Home",
       logout: "Logout",
       login: "Login",
       Print: "Print"
     },
     hi: {
       title: "डीएम जनसुनवाई पोर्टल",
-      home: "होम",
       reports: "रिपोर्ट्स",
+      home: "होम",
       logout: "लॉगआउट",
       login: "लॉगिन"
     }
@@ -49,8 +50,8 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage
             <div>
               <h1 className="text-xl md:text-2xl font-bold">{t.title}</h1>
               {isLoggedIn && (
-                <nav className="mt-1">
-                  <ul className="flex space-x-4 text-sm md:text-base">
+                <nav className="mt-3">
+                  <ul className="flex justify-center space-x-4">
                     <li>
                       <Link to="/dashboard" className="hover:text-jansunwayi-gray bx1 transition-colors">
                         {t.home}
@@ -62,13 +63,22 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage
                       >
                         {t.reports}
                       </button>
-                      <ul className="absolute left-0 mt-2 w-48 bg-white text-jansunwayi-blue rounded shadow-lg opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity z-10">
+                      <ul className="absolute left-0 mt-2 w-48 bg-gray-3git checkout -b navchanges
+00 text-jansunwayi-blue rounded shadow-lg opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity z-10">
                         <li>
                           <Link
                             to="/reports"
                             className="block px-4 py-2 hover:bg-blue-500 hover:text-white transition-colors"
                           >
                             Department Report
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            to=""
+                            className="block px-4 py-2 hover:bg-blue-500 hover:text-white transition-colors"
+                          >
+                            Contempt Cases
                           </Link>
                         </li>
                         
