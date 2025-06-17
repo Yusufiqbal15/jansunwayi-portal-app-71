@@ -82,7 +82,8 @@ const CaseDetailPage: React.FC = () => {
     { value: 'writ', name_en: 'Writ', name_hi: 'रिट' },
     { value: 'pil', name_en: 'PIL', name_hi: 'पीआईएल' },
     { value: 'criminal', name_en: 'Criminal', name_hi: 'आपराधिक' },
-    { value: 'civil', name_en: 'Civil', name_hi: 'नागरिक' }
+    { value: 'civil', name_en: 'Civil', name_hi: 'नागरिक' },
+    { value : 'contempt', name_en: 'Contempt Cases', name_hi:'अवमानना ​​मामले'}
   ];
   
   const departments = [
@@ -158,6 +159,8 @@ const CaseDetailPage: React.FC = () => {
       cancel: "Cancel",
       pending: "Pending",
       resolved: "Resolved",
+      contempt: "Contempt Case",
+
       yes: "Yes",
       no: "No",
       selectDate: "Select date",
@@ -194,6 +197,8 @@ const CaseDetailPage: React.FC = () => {
       cancel: "रद्द करें",
       pending: "लंबित",
       resolved: "निराकृत",
+      contempt: "अवमानना ​​मामले",
+     
       yes: "हां",
       no: "नहीं",
       selectDate: "तिथि चुनें",

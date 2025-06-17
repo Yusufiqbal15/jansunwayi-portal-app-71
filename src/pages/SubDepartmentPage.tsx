@@ -94,6 +94,8 @@ const SubDepartmentPage: React.FC = () => {
             </p>
           </div>
         </Card>
+       
+        
       </div>
       
       {/* Cases Table */}

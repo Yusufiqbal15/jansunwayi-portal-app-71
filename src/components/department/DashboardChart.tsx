@@ -64,7 +64,8 @@ function getDepartmentStats(deptId: number, cases: Case[] | undefined) {
   const total = deptCases.length;
   const pending = deptCases.filter(c => c.status === 'Pending').length;
   const resolved = deptCases.filter(c => c.status === 'Resolved').length;
-  return { total, pending, resolved };
+  const contempt = deptCases.filter(c => c.status === 'Contempt Cases').length;
+  return { total, pending, resolved, contempt };
 }
 
 type Props = {
@@ -83,7 +84,7 @@ const DashboardChart: React.FC<Props> = ({ currentLang }) => {
    
   });
 
-  const handleClick = (departmentId: number, status: 'total' | 'pending' | 'resolved') => {
+  const handleClick = (departmentId: number, status: 'total' | 'pending' | 'resolved' | 'contempt') => {
     navigate(`/cases?department=${departmentId}&status=${status}`);
   };
 
@@ -128,6 +129,9 @@ const DashboardChart: React.FC<Props> = ({ currentLang }) => {
             </th>
             <th className="p-3 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-900 font-semibold rounded-tr-lg">
               {currentLang === 'hi' ? 'निराकृत' : 'Resolved Cases'}
+            </th>
+            <th className="p-3 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-900 font-semibold rounded-tr-lg">
+              {currentLang === 'hi' ? 'अवमानना ​​मामले' : 'Contempt Cases'}
             </th>
           </tr>
         </thead>
@@ -178,6 +182,16 @@ className="p-3 font-semibold cursor-pointer text-black hover:text-gray-800"
                   title={currentLang === 'hi' ? 'निराकृत मामले देखें' : 'View resolved cases'}
                 >
                   {stats.resolved}
+                </td>
+                <td
+                  className="p-3 text-center font-bold text-green-700 bg-green-100 rounded-r-lg cursor-pointer hover:underline"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleClick(dept.id, 'contempt')}
+                  onKeyPress={e => { if (e.key === 'Enter') handleClick(dept.id, 'contempt'); }}
+                  title={currentLang === 'hi' ? 'अवमानना ​​मामले' : 'View Contempt Cases'}
+                >
+                  {stats.contempt}
                 </td>
               </tr>
             );
