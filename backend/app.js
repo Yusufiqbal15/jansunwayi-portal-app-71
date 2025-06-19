@@ -8,7 +8,7 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect('mongodb+srv://yadavanubhav848:zHjucA4rNlmQNaay@cluster1.hcyqa2d.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1')
   .then(() => {
     console.log('MongoDB connected');
     console.log('Mongoose readyState:', mongoose.connection.readyState); // 1 means connected
