@@ -6,13 +6,13 @@ import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
 
 const LoginPage: React.FC = () => {
-  const { login, currentLang } = useApp();
+  const { currentLang } = useApp();
   const navigate = useNavigate();
-  
-  const [email, setEmail] = useState('');
+
+  const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [selectedRole, setSelectedRole] = useState<'admin' | 'user'>('user');
-  
+
   const translations = {
     en: {
       title: "Ayodhya Court Case Portal",
@@ -43,47 +43,52 @@ const LoginPage: React.FC = () => {
       loginError: "अमान्य क्रेडेंशियल्स। कृपया पुनः प्रयास करें।"
     }
   };
-  
+
   const t = translations[currentLang];
-  
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!email) {
+
+    if (!id) {
       toast.error(t.emailRequired);
       return;
     }
-    
     if (!password) {
       toast.error(t.passwordRequired);
       return;
     }
-    
+
     try {
-      // In a real app, you would validate credentials against a backend
-      login(email, password, selectedRole);
+      const res = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, password, role: selectedRole }),
+      });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      localStorage.setItem('token', data.token);
       toast.success(t.loginSuccess);
       navigate('/dashboard');
     } catch (error) {
       toast.error(t.loginError);
     }
   };
-  
+
   return (
-    <div className="flex  items-center justify-center min-h-[calc(100vh-200px)]">
+    <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
       <Card className="w-full max-w-md p-6">
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-jansunwayi-navy">{t.title}</h1>
           <p className="text-jansunwayi-darkgray">{t.subtitle}</p>
         </div>
-        
+
         <div className="mb-6">
           <div className="flex rounded-md overflow-hidden border">
             <button
               type="button"
               className={`flex-1 py-2 text-center ${
-                selectedRole === 'admin' 
-                  ? 'bg-jansunwayi-blue text-white' 
+                selectedRole === 'admin'
+                  ? 'bg-jansunwayi-blue text-white'
                   : 'bg-white text-jansunwayi-darkgray'
               }`}
               onClick={() => setSelectedRole('admin')}
@@ -93,8 +98,8 @@ const LoginPage: React.FC = () => {
             <button
               type="button"
               className={`flex-1 py-2 text-center ${
-                selectedRole === 'user' 
-                  ? 'bg-jansunwayi-blue text-white' 
+                selectedRole === 'user'
+                  ? 'bg-jansunwayi-blue text-white'
                   : 'bg-white text-jansunwayi-darkgray'
               }`}
               onClick={() => setSelectedRole('user')}
@@ -103,35 +108,46 @@ const LoginPage: React.FC = () => {
             </button>
           </div>
         </div>
-        
+
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
               <input
                 type="text"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={t.emailPlaceholder}
+                value={id}
+                onChange={(e) => setId(e.target.value)}
+                placeholder={
+                  selectedRole === 'admin'
+                    ? currentLang === 'hi'
+                      ? 'प्रशासक आईडी'
+                      : 'Admin ID'
+                    : currentLang === 'hi'
+                    ? 'यूजर आईडी'
+                    : 'User ID'
+                }
                 className="input-field"
               />
             </div>
-            
             <div>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder={t.passwordPlaceholder}
+                placeholder={
+                  selectedRole === 'admin'
+                    ? t.passwordPlaceholder + ' (Admin)'
+                    : t.passwordPlaceholder + ' (User)'
+                }
                 className="input-field"
               />
             </div>
-            
+
             <div className="flex items-center justify-between">
               <Button type="submit" className="btn-primary w-full">
                 {t.loginButton}
               </Button>
             </div>
-            
+
             <div className="text-center mt-4">
               <a href="#" className="text-jansunwayi-blue hover:underline text-sm">
                 {t.forgotPassword}
