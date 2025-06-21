@@ -11,7 +11,7 @@ const app = express();
 app.use(express.json());
 
 // TODO: Move the MongoDB connection string to an environment variable for production security.
-mongoose.connect('mongodb+srv://yadavanubhav848:zHjucA4rNlmQNaay@cluster1.hcyqa2d.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1')
+mongoose.connect('mongodb+srv://yadavanubhav848: zHjucA4rNlmQNaay@cluster1.hcyqa2d.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1')
   .then(() => {
     console.log('MongoDB connected');
     console.log('Mongoose readyState:', mongoose.connection.readyState); // 1 means connected
