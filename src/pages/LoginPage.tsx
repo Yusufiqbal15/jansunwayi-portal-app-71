@@ -17,13 +17,14 @@ const LoginPage: React.FC = () => {
     en: {
       title: "Ayodhya Court Case Portal",
       subtitle: "Login to access the portal",
-      emailPlaceholder: "Email / Phone number",
+      idPlaceholderAdmin: "Admin ID",
+      idPlaceholderUser: "User ID",
       passwordPlaceholder: "Password",
       loginButton: "Login",
       forgotPassword: "Forgot Password?",
       admin: "Admin",
       user: "User",
-      emailRequired: "Email is required",
+      idRequired: "ID is required",
       passwordRequired: "Password is required",
       loginSuccess: "Login successful",
       loginError: "Invalid credentials. Please try again."
@@ -31,13 +32,14 @@ const LoginPage: React.FC = () => {
     hi: {
       title: "डीएम जनसुनवाई पोर्टल",
       subtitle: "पोर्टल का उपयोग करने के लिए लॉगिन करें",
-      emailPlaceholder: "ईमेल / फोन नंबर",
+      idPlaceholderAdmin: "प्रशासक आईडी",
+      idPlaceholderUser: "यूजर आईडी",
       passwordPlaceholder: "पासवर्ड",
       loginButton: "लॉगिन",
       forgotPassword: "पासवर्ड भूल गए?",
       admin: "प्रशासक",
       user: "उपयोगकर्ता",
-      emailRequired: "ईमेल आवश्यक है",
+      idRequired: "आईडी आवश्यक है",
       passwordRequired: "पासवर्ड आवश्यक है",
       loginSuccess: "लॉगिन सफल",
       loginError: "अमान्य क्रेडेंशियल्स। कृपया पुनः प्रयास करें।"
@@ -50,7 +52,7 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
 
     if (!id) {
-      toast.error(t.emailRequired);
+      toast.error(t.idRequired);
       return;
     }
     if (!password) {
@@ -118,12 +120,8 @@ const LoginPage: React.FC = () => {
                 onChange={(e) => setId(e.target.value)}
                 placeholder={
                   selectedRole === 'admin'
-                    ? currentLang === 'hi'
-                      ? 'प्रशासक आईडी'
-                      : 'Admin ID'
-                    : currentLang === 'hi'
-                    ? 'यूजर आईडी'
-                    : 'User ID'
+                    ? t.idPlaceholderAdmin
+                    : t.idPlaceholderUser
                 }
                 className="input-field"
               />
@@ -133,11 +131,7 @@ const LoginPage: React.FC = () => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder={
-                  selectedRole === 'admin'
-                    ? t.passwordPlaceholder + ' (Admin)'
-                    : t.passwordPlaceholder + ' (User)'
-                }
+                placeholder={t.passwordPlaceholder}
                 className="input-field"
               />
             </div>
