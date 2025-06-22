@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import ReportsPage from './pages/ReportsPage';
+
 import { useQueryClient } from '@tanstack/react-query';
 import { fetchCases } from '@/lib/api';
 
@@ -30,13 +30,13 @@ const getMockCase = (id: string) => {
   const today = new Date();
   const hearingDate = new Date(today);
   hearingDate.setDate(today.getDate() + 5); // Within 7 days
-  
+
   const filingDate = new Date(today);
   filingDate.setDate(today.getDate() - 30);
-  
+
   const affidavitDueDate = new Date(today);
   affidavitDueDate.setDate(today.getDate() + 15);
-  
+
   return {
     id,
     caseNumber: '00125',
@@ -46,6 +46,7 @@ const getMockCase = (id: string) => {
     noticeNumber: 'NT/789/2025',
     writType: 'writ',
     department: '1',
+    subDepartment: '',
     status: 'Pending',
     hearingDate,
     reminderSent: false,
@@ -56,12 +57,43 @@ const getMockCase = (id: string) => {
   };
 };
 
+const departments = [
+  {
+    id: 1,
+    name_en: "Administration Department",
+    name_hi: "प्रशासन विभाग",
+    subDepartments: [
+      { id: '1a', name_en: "Admin Sub 1", name_hi: "प्रशासन उप 1" },
+      { id: '1b', name_en: "Admin Sub 2", name_hi: "प्रशासन उप 2" }
+    ]
+  },
+  {
+    id: 2,
+    name_en: "Development department",
+    name_hi: "विकास विभाग",
+    subDepartments: [
+      { id: '2a', name_en: "Dev Sub 1", name_hi: "विकास उप 1" }
+    ]
+  },
+  // ...baaki departments bina subDepartments ke...
+  { id: 3, name_en: "District Panchayat Department", name_hi: "जिला पंचायत विभाग" },
+  { id: 4, name_en: "District Social Welfare Department", name_hi: "जिला समाज कल्याण विभाग" },
+  // ...yahan se aage subDepartments nahi diye...
+];
+
+const writTypes = [
+  { value: 'writ', name_en: 'Writ', name_hi: 'रिट' },
+  { value: 'pil', name_en: 'PIL', name_hi: 'पीआईएल' },
+  { value: 'criminal', name_en: 'Criminal', name_hi: 'आपराधिक' },
+  { value: 'civil', name_en: 'Civil', name_hi: 'नागरिक' }
+];
+
 const CaseDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { currentLang } = useApp();
   const queryClient = useQueryClient();
-  
+
   const [caseData, setCaseData] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState<any>(null);
@@ -69,7 +101,7 @@ const CaseDetailPage: React.FC = () => {
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [reminderEmail, setReminderEmail] = useState('');
   const [sending, setSending] = useState(false);
-  
+
   useEffect(() => {
     if (id) {
       const mockCase = getMockCase(id);
@@ -77,65 +109,31 @@ const CaseDetailPage: React.FC = () => {
       setEditedData(mockCase);
     }
   }, [id]);
-  
-  const writTypes = [
-    { value: 'writ', name_en: 'Writ', name_hi: 'रिट' },
-    { value: 'pil', name_en: 'PIL', name_hi: 'पीआईएल' },
-    { value: 'criminal', name_en: 'Criminal', name_hi: 'आपराधिक' },
-    { value: 'civil', name_en: 'Civil', name_hi: 'नागरिक' }
-  ];
-  
-  const departments = [
-    { id: 1, name_en: "Administration Department", name_hi: "प्रशासन विभाग" },
-    { id: 2, name_en: "Development department", name_hi: "विकास विभाग" },
-    { id: 3, name_en: "District Panchayat Department", name_hi: "जिला पंचायत विभाग" },
-    { id: 4, name_en: "District Social Welfare Department", name_hi: "जिला समाज कल्याण विभाग" },
-    { id: 5, name_en: "Animal Husbandry Department", name_hi: "पशुपालन विभाग" },
-    { id: 6, name_en: "District Industries Department", name_hi: "जिला उद्योग विभाग" },
-    { id: 7, name_en: "District Education Department", name_hi: "जिला शिक्षा विभाग" },
-    { id: 8, name_en: "District Health Department", name_hi: "जिला स्वास्थ्य विभाग" },
-    { id: 9, name_en: "District Agriculture Department", name_hi: "जिला कृषि विभाग" },
-    { id: 10, name_en: "District Forest Department", name_hi: "जिला वन विभाग" },
-    { id: 11, name_en: "District Program Department", name_hi: "जिला कार्यक्रम विभाग" },
-    { id: 12, name_en: "District Food and Marketing Department", name_hi: "जिला खाद्य एवं विपणन विभाग" },
-    { id: 13, name_en: "District Food Logistics Department", name_hi: "जिला खाद्य रसद विभाग" },
-    { id: 14, name_en: "Agriculture Department", name_hi: "कृषि विभाग" },
-    { id: 15, name_en: "Sugarcan Department", name_hi: "गन्ना विभाग" },
-    { id: 16, name_en: "Agricultural Production Market Committee", name_hi: "कृषि उत्पादन मंडी समिति" },
-    { id: 17, name_en: "labor department", name_hi: "श्रम विभाग" },
-    { id: 18, name_en: "Excise Department", name_hi: "आबकारी विभाग" },
-    { id: 19, name_en: "irrigation department", name_hi: "सिंचाई विभाग" },
-    { id: 20, name_en: "Public Works Department, Provincial Division", name_hi: "लोक निर्माण विभाग, प्रान्तीय खण्ड" },
-    { id: 21, name_en: "Public Works Department Construction Division-02", name_hi: "लोक निर्माण विभाग निर्माण खण्ड-02" },
-    { id: 22, name_en: "Public Works Department Construction Division-03", name_hi: "लोक निर्माण विभाग निर्माण खण्ड-03" },
-    { id: 23, name_en: "Public Works Department Division-04", name_hi: "लोक निर्माण विभाग खण्ड-04" },
-    { id: 24, name_en: "Public Works Department NH (National Highway) Division", name_hi: "लोक निर्माण विभाग एन0एच0 खण्ड" },
-    { id: 25, name_en: "Rural Engineering Department (R.E.D.)", name_hi: "ग्रामीण अभियंत्रण विभाग (आर०ई०डी०)" },
-    { id: 26, name_en: "Saryu Canal Division", name_hi: "सरयू नहर खण्ड" },
-    { id: 27, name_en: "Flood Works Division", name_hi: "बाढ़ कार्य खण्ड" },
-    { id: 28, name_en: "Groundwater Department", name_hi: "भूगर्भ जल विभाग"},
-    { id: 29, name_en: "Lift Irrigation Division", name_hi: "लिफ्ट सिंचाई खण्ड" },
-    { id: 30, name_en: "Tubewell Construction Division", name_hi: "नलकूप निर्माण खण्ड" },
-    { id: 31, name_en: "U.P. Jal Nigam Urban Construction Division", name_hi: "उ0 प्र0 जल निगम नगरीय निर्माण खण्ड" },
-    { id: 32, name_en: "Minor Irrigation Division Ayodhya", name_hi: "लघु सिंचाई खण्ड अयोध्या" },
-    { id: 33, name_en: "Electricity Department", name_hi: "विद्युत विभाग" },
-    { id: 34, name_en: "ITI Department", name_hi: "आई0टी0आई0 विभाग" },
-    { id: 35, name_en: "State Tax Department", name_hi: "राज्य कर विभाग" },
-    { id: 36, name_en: "Police Department", name_hi: "पुलिस विभाग" },
-    { id: 37, name_en: "Education Department", name_hi: "शिक्षा विभाग" },
-    { id: 38, name_en: "Divisional Transport Department", name_hi: "सम्भागीय परिवहन विभाग " },
-    { id: 39, name_en: "Uttar Pradesh State Road Transport Department", name_hi: "उ0 प्र0 राज्य सड़क परिवहन विभाग" },
-    { id: 40, name_en: "Information Department", name_hi: "सूचना विभाग " },
-    { id: 41, name_en: "Home Guards Department", name_hi: "होम गार्ड्स विभाग" },
-    { id: 42, name_en: "Health Department", name_hi: "स्वास्थ्य विभाग" },
-    { id: 43, name_en: "Stamp and Registration Department", name_hi: "स्टाम्प एवं रजिस्ट्रेशन विभाग" },
-    { id: 44, name_en: "Ayodhya Development Authority Ayodhya", name_hi: "अयोध्या विकास प्राधिकरण अयोध्या" },
-    { id: 45, name_en: "Public Works Department Electrical & Mechanical Section", name_hi: "लोक निर्माण विभाग विद्युत यांत्रिक खण्ड" },
-    { id: 46, name_en: "Cooperative Department", name_hi: "सहकारिता विभाग" },
-    { id: 47, name_en: "UPPCL U.P. Project Corporation Ltd. Construction Unit-11 Ayodhya", name_hi: "यूपीपीसीएल उ0 प्र0 प्रोजेक्ट कारपोरेशन लि0 निर्माण इकाई-11 अयोध्या।" },
-    { id: 48, name_en: "Other Miscellaneous Departments", name_hi: "अन्य विविध विभाग" },
-  ];
-  
+
+  // SubDepartment state
+  const [selectedSubDepartment, setSelectedSubDepartment] = useState('');
+
+  // Update subDepartment on department change
+  const handleDepartmentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    setEditedData((prev: any) => ({
+      ...prev,
+      department: value,
+      subDepartment: ''
+    }));
+    setSelectedSubDepartment('');
+  };
+
+  // Update subDepartment value
+  const handleSubDepartmentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    setEditedData((prev: any) => ({
+      ...prev,
+      subDepartment: value
+    }));
+    setSelectedSubDepartment(value);
+  };
+
   const translations = {
     en: {
       title: "Case Details",
@@ -146,6 +144,7 @@ const CaseDetailPage: React.FC = () => {
       noticeNumber: "Notice Number",
       writType: "Writ Type",
       department: "Department",
+      subDepartment: "Sub Department",
       status: "Status",
       hearingDate: "Hearing Date",
       reminderSent: "Reminder Sent 1 Week Prior",
@@ -182,6 +181,7 @@ const CaseDetailPage: React.FC = () => {
       noticeNumber: "नोटिस संख्या",
       writType: "रीट प्रकार",
       department: "विभाग",
+      subDepartment: "उप विभाग",
       status: "मामले की स्थिति",
       hearingDate: "सुनवाई दिनांक",
       reminderSent: "एक सप्ताह पूर्व स्मारक भेजा गया?",
@@ -210,9 +210,9 @@ const CaseDetailPage: React.FC = () => {
       reminderSentSuccess: "अनुस्मारक सफलतापूर्वक भेजा गया"
     }
   };
-  
+
   const t = translations[currentLang];
-  
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setEditedData((prev: any) => ({
@@ -220,45 +220,45 @@ const CaseDetailPage: React.FC = () => {
       [name]: value
     }));
   };
-  
+
   const handleStatusToggle = () => {
     setEditedData((prev: any) => ({
       ...prev,
       status: prev.status === 'Pending' ? 'Resolved' : 'Pending'
     }));
   };
-  
+
   const handleReminderToggle = () => {
     setEditedData((prev: any) => ({
       ...prev,
       reminderSent: !prev.reminderSent
     }));
   };
-  
+
   const handleCounterAffidavitToggle = () => {
     setEditedData((prev: any) => ({
       ...prev,
       counterAffidavitRequired: !prev.counterAffidavitRequired
     }));
   };
-  
+
   const handleSave = () => {
     setCaseData(editedData);
     setIsEditing(false);
     toast.success(t.saved);
     queryClient.invalidateQueries({ queryKey: ['cases'] });
   };
-  
+
   const handleDelete = () => {
     toast.success(t.deleted);
     queryClient.invalidateQueries({ queryKey: ['cases'] });
     navigate('/dashboard');
   };
-  
+
   const sendReminder = async () => {
     setShowEmailDialog(true);
   };
-  
+
   const handleSendEmail = async () => {
     setSending(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -268,7 +268,7 @@ const CaseDetailPage: React.FC = () => {
     toast.success(`${t.reminderSentSuccess} (${reminderEmail})`);
     queryClient.invalidateQueries({ queryKey: ['cases'] });
   };
-  
+
   const isWithin7Days = (date: Date) => {
     if (!date) return false;
     const now = new Date();
@@ -276,12 +276,12 @@ const CaseDetailPage: React.FC = () => {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays >= 0 && diffDays <= 7;
   };
-  
-  const needsReminder = caseData?.status === 'Pending' && 
-                        caseData?.hearingDate && 
-                        isWithin7Days(caseData.hearingDate) &&
-                        !caseData?.reminderSent;
-  
+
+  const needsReminder = caseData?.status === 'Pending' &&
+    caseData?.hearingDate &&
+    isWithin7Days(caseData.hearingDate) &&
+    !caseData?.reminderSent;
+
   if (!caseData) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -289,21 +289,28 @@ const CaseDetailPage: React.FC = () => {
       </div>
     );
   }
-  
+
   const getDepartmentName = (id: string) => {
-    const dept = departments.find(d => d.id === id);
+    const dept = departments.find(d => String(d.id) === String(id));
     return dept ? (currentLang === 'hi' ? dept.name_hi : dept.name_en) : '';
   };
-  
+
+  const getSubDepartmentName = (deptId: string, subId: string) => {
+    const dept = departments.find(d => String(d.id) === String(deptId));
+    if (!dept || !dept.subDepartments) return '';
+    const sub = dept.subDepartments.find((s: any) => String(s.id) === String(subId));
+    return sub ? (currentLang === 'hi' ? sub.name_hi : sub.name_en) : '';
+  };
+
   const getWritTypeName = (value: string) => {
     const type = writTypes.find(t => t.value === value);
     return type ? (currentLang === 'hi' ? type.name_hi : type.name_en) : '';
   };
-  
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-jansunwayi-navy mb-6">{t.title}</h1>
-      
+
       {/* Reminder Banner */}
       {needsReminder && (
         <div className="mb-6 reminder-card">
@@ -325,7 +332,7 @@ const CaseDetailPage: React.FC = () => {
           </div>
         </div>
       )}
-      
+
       <Card className="p-6">
         <div className="flex justify-end space-x-2 mb-6">
           {!isEditing ? (
@@ -371,7 +378,7 @@ const CaseDetailPage: React.FC = () => {
             </>
           )}
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Case Number */}
           <div>
@@ -392,7 +399,7 @@ const CaseDetailPage: React.FC = () => {
               </div>
             )}
           </div>
-          
+
           {/* Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -412,7 +419,7 @@ const CaseDetailPage: React.FC = () => {
               </div>
             )}
           </div>
-          
+
           {/* Filing Date */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -449,7 +456,7 @@ const CaseDetailPage: React.FC = () => {
               </div>
             )}
           </div>
-          
+
           {/* Petition Number */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -469,7 +476,7 @@ const CaseDetailPage: React.FC = () => {
               </div>
             )}
           </div>
-          
+
           {/* Notice Number */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -489,7 +496,7 @@ const CaseDetailPage: React.FC = () => {
               </div>
             )}
           </div>
-          
+
           {/* Writ Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -514,7 +521,7 @@ const CaseDetailPage: React.FC = () => {
               </div>
             )}
           </div>
-          
+
           {/* Department */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -524,7 +531,7 @@ const CaseDetailPage: React.FC = () => {
               <select
                 name="department"
                 value={editedData.department}
-                onChange={handleChange}
+                onChange={handleDepartmentChange}
                 className="input-field"
               >
                 {departments.map((dept) => (
@@ -539,7 +546,46 @@ const CaseDetailPage: React.FC = () => {
               </div>
             )}
           </div>
-          
+
+          {/* SubDepartment */}
+          {isEditing && (() => {
+            const dept = departments.find(d => String(d.id) === String(editedData.department));
+            if (dept && dept.subDepartments && dept.subDepartments.length > 0) {
+              return (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t.subDepartment}
+                  </label>
+                  <select
+                    name="subDepartment"
+                    value={editedData.subDepartment || ''}
+                    onChange={handleSubDepartmentChange}
+                    className="input-field"
+                  >
+                    <option value="">{currentLang === 'hi' ? 'चुनें' : 'Select'}</option>
+                    {dept.subDepartments.map((sub: any) => (
+                      <option key={sub.id} value={sub.id}>
+                        {currentLang === 'hi' ? sub.name_hi : sub.name_en}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              );
+            }
+            return null;
+          })()}
+
+          {!isEditing && caseData.subDepartment && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t.subDepartment}
+              </label>
+              <div className="px-3 py-2 border border-gray-200 rounded-md bg-gray-50">
+                {getSubDepartmentName(caseData.department, caseData.subDepartment)}
+              </div>
+            </div>
+          )}
+
           {/* Status */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -568,7 +614,7 @@ const CaseDetailPage: React.FC = () => {
               </div>
             )}
           </div>
-          
+
           {/* Hearing Date */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -605,7 +651,7 @@ const CaseDetailPage: React.FC = () => {
               </div>
             )}
           </div>
-          
+
           {/* Reminder Sent */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -640,7 +686,7 @@ const CaseDetailPage: React.FC = () => {
               </div>
             )}
           </div>
-          
+
           {/* Affidavit Due Date */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -677,7 +723,7 @@ const CaseDetailPage: React.FC = () => {
               </div>
             )}
           </div>
-          
+
           {/* Affidavit Submission Date */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -714,7 +760,7 @@ const CaseDetailPage: React.FC = () => {
               </div>
             )}
           </div>
-          
+
           {/* Counter Affidavit Section */}
           <div className="col-span-full">
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -752,7 +798,7 @@ const CaseDetailPage: React.FC = () => {
           </div>
         </div>
       </Card>
-      
+
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>

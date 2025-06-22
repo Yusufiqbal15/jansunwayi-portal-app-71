@@ -4,11 +4,13 @@ import { useApp } from '@/contexts/AppContext';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
+import AddSubDepartmentForm from '@/components/AddSubDepartmentForm';
 
 const DashboardPage: React.FC = () => {
   const { currentLang } = useApp();
   const [searchQuery, setSearchQuery] = useState<string>('');
-  
+  const [showAddSubDept, setShowAddSubDept] = useState(false);
+
   const departments = [
     { id: 1, name_en: "Administration Department", name_hi: "प्रशासन विभाग" },
     { id: 2, name_en: "Development department", name_hi: "विकास विभाग" },
@@ -85,6 +87,12 @@ const DashboardPage: React.FC = () => {
     );
   });
   
+  // Dummy handler for form submit
+  const handleAddSubDept = (data: { departmentId: string; subDeptNameEn: string; subDeptNameHi: string }) => {
+    // Yahan API call ya state update kar sakte hain
+    // alert(JSON.stringify(data));
+  };
+
   return (
     <div>
       <div className="mb-6">
@@ -92,8 +100,8 @@ const DashboardPage: React.FC = () => {
         <p className="text-jansunwayi-darkgray">{t.subtitle}</p>
       </div>
 
-      <div className="mb-6">
-        <div className="relative max-w-md">
+      <div className="mb-6 flex gap-4 items-center">
+        <div className="relative max-w-md flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
             type="text"
@@ -103,8 +111,23 @@ const DashboardPage: React.FC = () => {
             className="pl-10"
           />
         </div>
+        <button
+          className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+          onClick={() => setShowAddSubDept(true)}
+        >
+          {currentLang === 'hi' ? 'उप विभाग जोड़ें' : 'Add Sub Department'}
+        </button>
       </div>
-      
+
+      {showAddSubDept && (
+        <AddSubDepartmentForm
+          departments={departments}
+          currentLang={currentLang}
+          onClose={() => setShowAddSubDept(false)}
+          onSubmit={handleAddSubDept}
+        />
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredDepartments.map((dept) => (
           <Link to={`/department/${dept.id}`} key={dept.id}>
