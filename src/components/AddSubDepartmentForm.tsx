@@ -67,7 +67,7 @@ const AddSubDepartmentForm: React.FC<AddSubDepartmentFormProps> = ({
               placeholder={currentLang === 'hi' ? 'उप विभाग नाम (अंग्रेज़ी)' : 'Sub Department Name (English)'}
             />
           </div>
-          <div className="flex justify-end gap-2">
+                                                                                              <div className="flex justify-end gap-2">
             <button
               type="button"
               onClick={onClose}

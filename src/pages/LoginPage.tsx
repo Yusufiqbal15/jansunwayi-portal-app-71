@@ -4,6 +4,8 @@ import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { auth } from '@/components/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 const LoginPage: React.FC = () => {
   const { login, currentLang } = useApp();
@@ -11,7 +13,6 @@ const LoginPage: React.FC = () => {
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [selectedRole, setSelectedRole] = useState<'admin' | 'user'>('user');
   
   const translations = {
     en: {
@@ -22,7 +23,6 @@ const LoginPage: React.FC = () => {
       loginButton: "Login",
       forgotPassword: "Forgot Password?",
       admin: "Admin",
-      user: "User",
       emailRequired: "Email is required",
       passwordRequired: "Password is required",
       loginSuccess: "Login successful",
@@ -36,7 +36,6 @@ const LoginPage: React.FC = () => {
       loginButton: "लॉगिन",
       forgotPassword: "पासवर्ड भूल गए?",
       admin: "प्रशासक",
-      user: "उपयोगकर्ता",
       emailRequired: "ईमेल आवश्यक है",
       passwordRequired: "पासवर्ड आवश्यक है",
       loginSuccess: "लॉगिन सफल",
@@ -46,22 +45,21 @@ const LoginPage: React.FC = () => {
   
   const t = translations[currentLang];
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email) {
       toast.error(t.emailRequired);
       return;
     }
-    
+
     if (!password) {
       toast.error(t.passwordRequired);
       return;
     }
-    
+
     try {
-      // In a real app, you would validate credentials against a backend
-      login(email, password, selectedRole);
+      await signInWithEmailAndPassword(auth, email, password);
       toast.success(t.loginSuccess);
       navigate('/reports');
     } catch (error) {
@@ -81,25 +79,10 @@ const LoginPage: React.FC = () => {
           <div className="flex rounded-md overflow-hidden border">
             <button
               type="button"
-              className={`flex-1 py-2 text-center ${
-                selectedRole === 'admin' 
-                  ? 'bg-jansunwayi-blue text-white' 
-                  : 'bg-white text-jansunwayi-darkgray'
-              }`}
-              onClick={() => setSelectedRole('admin')}
+              className="flex-1 py-2 text-center bg-jansunwayi-blue text-white cursor-default"
+              disabled
             >
               {t.admin}
-            </button>
-            <button
-              type="button"
-              className={`flex-1 py-2 text-center ${
-                selectedRole === 'user' 
-                  ? 'bg-jansunwayi-blue text-white' 
-                  : 'bg-white text-jansunwayi-darkgray'
-              }`}
-              onClick={() => setSelectedRole('user')}
-            >
-              {t.user}
             </button>
           </div>
         </div>
