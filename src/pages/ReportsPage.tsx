@@ -8,10 +8,10 @@ const ReportsPage: React.FC = () => {
 
   return (
     <div>
-      {isLoggedIn && (
-        <Header isLoggedIn={isLoggedIn} currentLang={currentLang} toggleLanguage={toggleLanguage} />
-      )}
-      <div ><DashboardChart currentLang={currentLang} /></div>
+      <Header isLoggedIn={isLoggedIn} currentLang={currentLang} toggleLanguage={toggleLanguage} />
+      <div>
+        <DashboardChart currentLang={currentLang} />
+      </div>
     </div>
   );
 };

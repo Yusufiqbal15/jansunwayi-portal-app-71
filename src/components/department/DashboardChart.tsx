@@ -5,6 +5,7 @@ import { fetchCases, Case } from '@/lib/api';
 import SubDepartmentData from './SubDepartmentData';
 
 
+
 const departments = [
   { id: 1, name_en: "Administration Department", name_hi: "प्रशासन विभाग" },
   { id: 2, name_en: "Development department", name_hi: "विकास विभाग" },
@@ -113,6 +114,7 @@ const DashboardChart: React.FC<Props> = ({ currentLang }) => {
 
   return (
     <div className="overflow-x-auto rounded-lg shadow-lg bg-white p-6">
+   
       <table className="min-w-full border-separate border-spacing-y-2">
         <thead>
           <tr>

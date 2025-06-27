@@ -31,7 +31,7 @@ const App = () => (
               <Route index element={<LoginPage />} />
             </Route>
             <Route path="/" element={<Layout requireAuth />}>
-              <Route path="dashboard" element={<DashboardPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="department/:id" element={<DepartmentPage />} />
               <Route path="sub-department/:id" element={<SubDepartmentPage />} />
               <Route path="add-case" element={<AddCasePage />} />

@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import AddSubDepartmentForm from '@/components/AddSubDepartmentForm';
+import { uploadDepartmentsToFirestore } from '@/utils/departmentUtils';
 
 const DashboardPage: React.FC = () => {
   const { currentLang } = useApp();
@@ -93,6 +94,11 @@ const DashboardPage: React.FC = () => {
     // alert(JSON.stringify(data));
   };
 
+  const handleUploadDepartments = async () => {
+    await uploadDepartmentsToFirestore();
+    alert('Departments uploaded to Firestore!');
+  };
+
   return (
     <div>
       <div className="mb-6">
@@ -127,6 +133,13 @@ const DashboardPage: React.FC = () => {
           onSubmit={handleAddSubDept}
         />
       )}
+
+      <button
+        onClick={handleUploadDepartments}
+        style={{ background: '#2563eb', color: 'white', padding: '8px 16px', borderRadius: '4px', marginBottom: '16px' }}
+      >
+        Upload Departments to Firestore
+      </button>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredDepartments.map((dept) => (

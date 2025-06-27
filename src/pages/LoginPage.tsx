@@ -60,8 +60,9 @@ const LoginPage: React.FC = () => {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      login(email, password, auth);
       toast.success(t.loginSuccess);
-      navigate('/reports');
+      navigate('/dashboard');
     } catch (error) {
       toast.error(t.loginError);
     }

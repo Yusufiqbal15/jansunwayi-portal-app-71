@@ -1,4 +1,6 @@
 import { format } from 'date-fns';
+import { db } from '@/components/firebase';
+import { collection, setDoc, doc } from "firebase/firestore";
 
 // Helper function to check if a date is within specified days from now
 export const isWithinDays = (date: Date, days: number): boolean => {
@@ -166,3 +168,12 @@ export type CaseType = {
 };
 
 export type TranslationType = typeof translations.en;
+
+// Firestore upload function
+export const uploadDepartmentsToFirestore = async () => {
+  const departmentsCollection = collection(db, "Departments");
+  for (const dept of departments) {
+    await setDoc(doc(departmentsCollection, dept.id.toString()), dept);
+  }
+  console.log("All departments uploaded to Firestore!");
+};
