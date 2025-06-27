@@ -95,7 +95,7 @@ const DashboardPage: React.FC = () => {
   };
 
   const handleUploadDepartments = async () => {
-    await uploadDepartmentsToFirestore();
+    await uploadDepartmentsToFirestore(departments); // <-- departments pass karein
     alert('Departments uploaded to Firestore!');
   };
 

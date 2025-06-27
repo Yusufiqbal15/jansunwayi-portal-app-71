@@ -1,4 +1,3 @@
-import { format } from 'date-fns';
 import { db } from '@/components/firebase';
 import { collection, setDoc, doc } from "firebase/firestore";
 
@@ -170,10 +169,9 @@ export type CaseType = {
 export type TranslationType = typeof translations.en;
 
 // Firestore upload function
-export const uploadDepartmentsToFirestore = async () => {
+export const uploadDepartmentsToFirestore = async (departments: any[]) => {
   const departmentsCollection = collection(db, "Departments");
   for (const dept of departments) {
     await setDoc(doc(departmentsCollection, dept.id.toString()), dept);
   }
-  console.log("All departments uploaded to Firestore!");
 };
