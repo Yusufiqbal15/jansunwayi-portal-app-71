@@ -134,12 +134,7 @@ const DashboardPage: React.FC = () => {
         />
       )}
 
-      <button
-        onClick={handleUploadDepartments}
-        style={{ background: '#2563eb', color: 'white', padding: '8px 16px', borderRadius: '4px', marginBottom: '16px' }}
-      >
-        Upload Departments to Firestore
-      </button>
+      
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredDepartments.map((dept) => (
