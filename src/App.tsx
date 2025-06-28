@@ -13,6 +13,7 @@ import CaseDetailPage from "./pages/CaseDetailPage";
 import NotFound from "./pages/NotFound";
 import SubDepartmentPage from '@/pages/SubDepartmentPage';
 import SubDepartmentsListPage from '@/pages/SubDepartmentsListPage';
+import AllCasesPage from '@/pages/AllCasesPage';
 import HomePage from '@/pages/HomePage';
 import CasesPage from '@/pages/CasesPage';
 import ReportsPage from './pages/ReportsPage';
@@ -36,6 +37,7 @@ const App = () => (
               <Route path="department/:id" element={<DepartmentPage />} />
               <Route path="sub-department/:id" element={<SubDepartmentPage />} />
               <Route path="sub-departments" element={<SubDepartmentsListPage />} />
+              <Route path="all-cases/:subDepartmentId" element={<AllCasesPage />} />
               <Route path="add-case" element={<AddCasePage />} />
               <Route path="case/:id" element={<CaseDetailPage />} />
             </Route>

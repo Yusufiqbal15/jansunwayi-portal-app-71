@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import DepartmentHeader from '@/components/department/DepartmentHeader';
 import SubDepartments from '@/components/department/SubDepartments';
@@ -10,13 +10,14 @@ import {
 } from '@/utils/departmentUtils';
 import { fetchSubDepartments, fetchDepartments } from '@/lib/api';
 import { Input } from '@/components/ui/input';
-import { Search, RefreshCw } from 'lucide-react';
+import { Search, RefreshCw, Eye, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
 const DepartmentPage: React.FC = () => {
   const { currentLang } = useApp();
   const { departmentId } = useParams<{ departmentId: string }>();
+  const navigate = useNavigate();
   const [showSubDepartments, setShowSubDepartments] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [subDepartments, setSubDepartments] = useState<any[]>([]);
@@ -66,6 +67,14 @@ const DepartmentPage: React.FC = () => {
     setRefreshing(true);
     await fetchData();
     setRefreshing(false);
+  };
+
+  const handleSubDepartmentClick = (subDeptId: string) => {
+    navigate(`/add-case?subDepartment=${subDeptId}`);
+  };
+
+  const handleViewCases = (subDeptId: string) => {
+    navigate(`/all-cases/${subDeptId}`);
   };
   
   // Get the current department
@@ -133,13 +142,40 @@ const DepartmentPage: React.FC = () => {
               {departmentSubDepts.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {departmentSubDepts.map((subDept) => (
-                    <div key={subDept._id || subDept.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div 
+                      key={subDept._id || subDept.id} 
+                      className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                      onClick={() => handleSubDepartmentClick(subDept._id || subDept.id.toString())}
+                    >
                       <h3 className="font-semibold text-jansunwayi-navy mb-2">
                         {currentLang === 'hi' ? subDept.name_hi : subDept.name_en}
                       </h3>
-                      <p className="text-sm text-jansunwayi-darkgray">
+                      <p className="text-sm text-jansunwayi-darkgray mb-3">
                         {currentLang === 'hi' ? subDept.name_en : subDept.name_hi}
                       </p>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSubDepartmentClick(subDept._id || subDept.id.toString());
+                          }}
+                          size="sm"
+                          className="flex-1 bg-blue-600 hover:bg-blue-700"
+                        >
+                          <Plus className="h-4 w-4 mr-1" />
+                          {currentLang === 'hi' ? 'मामला जोड़ें' : 'Add Case'}
+                        </Button>
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleViewCases(subDept._id || subDept.id.toString());
+                          }}
+                          size="sm"
+                          variant="outline"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -174,13 +210,40 @@ const DepartmentPage: React.FC = () => {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {filteredSubDepts.map((subDept) => (
-                    <div key={subDept._id || subDept.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div 
+                      key={subDept._id || subDept.id} 
+                      className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                      onClick={() => handleSubDepartmentClick(subDept._id || subDept.id.toString())}
+                    >
                       <h3 className="font-semibold text-jansunwayi-navy mb-2">
                         {currentLang === 'hi' ? subDept.name_hi : subDept.name_en}
                       </h3>
-                      <p className="text-sm text-jansunwayi-darkgray">
+                      <p className="text-sm text-jansunwayi-darkgray mb-3">
                         {currentLang === 'hi' ? subDept.name_en : subDept.name_hi}
                       </p>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSubDepartmentClick(subDept._id || subDept.id.toString());
+                          }}
+                          size="sm"
+                          className="flex-1 bg-blue-600 hover:bg-blue-700"
+                        >
+                          <Plus className="h-4 w-4 mr-1" />
+                          {currentLang === 'hi' ? 'मामला जोड़ें' : 'Add Case'}
+                        </Button>
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleViewCases(subDept._id || subDept.id.toString());
+                          }}
+                          size="sm"
+                          variant="outline"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>

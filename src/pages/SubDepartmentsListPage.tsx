@@ -3,13 +3,15 @@ import { useApp } from '@/contexts/AppContext';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, RefreshCw, Plus } from 'lucide-react';
+import { Search, RefreshCw, Plus, Eye } from 'lucide-react';
 import { fetchSubDepartments, fetchDepartments } from '@/lib/api';
 import { toast } from 'sonner';
 import AddSubDepartmentForm from '@/components/AddSubDepartmentForm';
+import { useNavigate } from 'react-router-dom';
 
 const SubDepartmentsListPage: React.FC = () => {
   const { currentLang } = useApp();
+  const navigate = useNavigate();
   const [subDepartments, setSubDepartments] = useState<any[]>([]);
   const [departments, setDepartments] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -71,6 +73,14 @@ const SubDepartmentsListPage: React.FC = () => {
       console.error('SubDepartmentsListPage: Error adding sub-department:', error);
       toast.error(currentLang === 'hi' ? 'उप-विभाग जोड़ने में त्रुटि' : 'Error adding sub-department');
     }
+  };
+
+  const handleSubDepartmentClick = (subDeptId: string) => {
+    navigate(`/add-case?subDepartment=${subDeptId}`);
+  };
+
+  const handleViewCases = (subDeptId: string) => {
+    navigate(`/all-cases/${subDeptId}`);
   };
 
   // Filter sub-departments based on search query and selected department
@@ -164,7 +174,11 @@ const SubDepartmentsListPage: React.FC = () => {
       {/* Sub-Departments Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredSubDepts.map((subDept) => (
-          <Card key={subDept._id} className="hover:shadow-lg transition-shadow">
+          <Card 
+            key={subDept._id} 
+            className="hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={() => handleSubDepartmentClick(subDept._id || subDept.id.toString())}
+          >
             <div className="p-6">
               <div className="flex justify-between items-start mb-3">
                 <h3 className="text-lg font-semibold text-jansunwayi-navy">
@@ -179,9 +193,33 @@ const SubDepartmentsListPage: React.FC = () => {
                 {currentLang === 'hi' ? subDept.name_en : subDept.name_hi}
               </p>
               
-              <div className="text-xs text-gray-500">
+              <div className="text-xs text-gray-500 mb-3">
                 <p><strong>{currentLang === 'hi' ? 'विभाग:' : 'Department:'}</strong> {getDepartmentName(subDept.departmentId)}</p>
                 <p><strong>{currentLang === 'hi' ? 'बनाया गया:' : 'Created:'}</strong> {new Date(subDept.createdAt).toLocaleDateString()}</p>
+              </div>
+
+              <div className="flex gap-2">
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSubDepartmentClick(subDept._id || subDept.id.toString());
+                  }}
+                  size="sm"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  {currentLang === 'hi' ? 'मामला जोड़ें' : 'Add Case'}
+                </Button>
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleViewCases(subDept._id || subDept.id.toString());
+                  }}
+                  size="sm"
+                  variant="outline"
+                >
+                  <Eye className="h-4 w-4" />
+                </Button>
               </div>
             </div>
           </Card>
@@ -199,7 +237,6 @@ const SubDepartmentsListPage: React.FC = () => {
         </div>
       )}
 
-      {/* Add Sub-Department Form */}
       {showAddForm && (
         <AddSubDepartmentForm
           departments={departments}

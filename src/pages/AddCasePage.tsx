@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Search, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
@@ -10,7 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
-import { fetchSubDepartments, fetchDepartments } from '@/lib/api';
+import { fetchSubDepartments, fetchDepartments, createCase } from '@/lib/api';
 
 const subDepartments = [
   { id: 1, name_en: "Tehsildar Rudauli", name_hi: "तहसीलदार रुदौली" },
@@ -40,11 +42,13 @@ const subDepartments = [
 
 const AddCasePage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { currentLang } = useApp();
   const queryClient = useQueryClient();
   const [departments, setDepartments] = useState<any[]>([]);
   const [subDepartments, setSubDepartments] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [submitting, setSubmitting] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     caseNumber: '',
     name: '',
@@ -69,19 +73,23 @@ const AddCasePage: React.FC = () => {
       noticeNumber: "Notice Number",
       writType: "Writ Type",
       department: "Department",
+      subDepartment: "Sub-Department",
       affidavitDueDate: "Due Date to Submit Affidavit",
       affidavitSubmissionDate: "Affidavit Submission Date",
       save: "Save Case",
       cancel: "Cancel",
       selectDate: "Select date",
       selectDepartment: "Select department",
+      selectSubDepartment: "Select sub-department",
       selectWritType: "Select writ type",
       saved: "Case has been saved successfully",
       validation: "Please fill in all required fields",
       isthecounteraffidavittobefiledornot: " Is The Counter-Affidavit to be filed or not?",
       counterAffidavitinstruction: "Counter Affidavit (instruction)",
       yes: "Yes",
-      no: "No"
+      no: "No",
+      viewAllCases: "View All Cases",
+      backToCases: "Back to Cases"
     },
     hi: {
       title: "नया मामला जोड़ें",
@@ -92,19 +100,23 @@ const AddCasePage: React.FC = () => {
       noticeNumber: "नोटिस संख्या",
       writType: "रीट प्रकार",
       department: "विभाग",
+      subDepartment: "उप-विभाग",
       affidavitDueDate: "प्रतिसपथ पत्र दाखिल करने हेतु निर्धारित तिथि",
       affidavitSubmissionDate: "प्रतिसपथ पत्र दाखिल होने की तिथि",
       save: "मामला सहेजें",
       cancel: "रद्द करें",
       selectDate: "तिथि चुनें",
       selectDepartment: "विभाग चुनें",
+      selectSubDepartment: "उप-विभाग चुनें",
       selectWritType: "रीट प्रकार चुनें",
       saved: "मामला सफलतापूर्वक सहेज दिया गया है",
       validation: "कृपया सभी आवश्यक फ़ील्ड भरें",
       isthecounteraffidavittobefiledornot: "प्रतिसपथ पत्र पत्र दाखिल होना है या नहीं ?",
       counterAffidavitinstruction: "प्रतिसपथ पत्र (आदेश)",
       yes: "हां",
-      no: "नहीं"
+      no: "नहीं",
+      viewAllCases: "सभी मामले देखें",
+      backToCases: "मामलों पर वापस जाएं"
     }
   };
 
@@ -113,6 +125,23 @@ const AddCasePage: React.FC = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    // Handle URL parameter for pre-selecting sub-department
+    const subDeptParam = searchParams.get('subDepartment');
+    if (subDeptParam && subDepartments.length > 0) {
+      const subDept = subDepartments.find(sub => 
+        sub._id === subDeptParam || sub.id === parseInt(subDeptParam)
+      );
+      if (subDept) {
+        setFormData(prev => ({
+          ...prev,
+          department: subDept.departmentId.toString(),
+          subDepartment: subDept._id || subDept.id.toString()
+        }));
+      }
+    }
+  }, [searchParams, subDepartments]);
 
   const fetchData = async () => {
     try {
@@ -130,39 +159,12 @@ const AddCasePage: React.FC = () => {
       setDepartments([
         { id: 1, name_en: "Administration Department", name_hi: "प्रशासन विभाग" },
         { id: 2, name_en: "Development department", name_hi: "विकास विभाग" },
-        // ... add more static departments as fallback
       ]);
       setSubDepartments([]);
     } finally {
       setLoading(false);
     }
   };
-
-  // Create dynamic subDepartmentsMap that includes database sub-departments
-  const createSubDepartmentsMap = () => {
-    const map: { [key: number]: { id: number; name_en: string; name_hi: string }[] } = {};
-    
-    for (let i = 1; i <= 49; i++) {
-      // Start with static sub-departments
-      let deptSubDepts = [...subDepartments];
-      
-      // Add database sub-departments for department 1
-      if (i === 1) {
-        const dbSubDepts = subDepartments.map(dbSub => ({
-          id: parseInt(dbSub._id.slice(-6), 16), // Use last 6 chars of _id as number
-          name_en: dbSub.name || '',
-          name_hi: dbSub.description || ''
-        }));
-        deptSubDepts = [...deptSubDepts, ...dbSubDepts];
-      }
-      
-      map[i] = deptSubDepts;
-    }
-    
-    return map;
-  };
-
-  const subDepartmentsMap = createSubDepartmentsMap();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -173,7 +175,7 @@ const AddCasePage: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (
@@ -187,251 +189,334 @@ const AddCasePage: React.FC = () => {
       return;
     }
 
-    toast.success(t.saved);
-    navigate('/dashboard');
+    try {
+      setSubmitting(true);
+      
+      // Find the selected sub-department to get the correct ID
+      const selectedSubDept = subDepartments.find(sub => 
+        sub._id === formData.subDepartment || sub.id === parseInt(formData.subDepartment)
+      );
+      
+      const caseData = {
+        caseNumber: formData.caseNumber,
+        name: formData.name,
+        filingDate: formData.filingDate,
+        petitionNumber: formData.petitionNumber,
+        noticeNumber: formData.noticeNumber,
+        writType: formData.writType,
+        department: parseInt(formData.department),
+        subDepartment: selectedSubDept ? selectedSubDept._id : undefined, // Send the MongoDB ObjectId
+        affidavitDueDate: formData.affidavitDueDate,
+        affidavitSubmissionDate: formData.affidavitSubmissionDate,
+        counterAffidavitRequired: formData.counterAffidavitRequired,
+        status: 'Pending'
+      };
+
+      console.log('Submitting case data:', caseData);
+      const result = await createCase(caseData);
+      console.log('Case created successfully:', result);
+      
+      toast.success(t.saved);
+      
+      // Navigate to all cases page for the sub-department if available
+      if (formData.subDepartment) {
+        navigate(`/all-cases/${formData.subDepartment}`);
+      } else {
+        navigate('/dashboard');
+      }
+      
+    } catch (error) {
+      console.error('Error creating case:', error);
+      toast.error(currentLang === 'hi' ? 'मामला बनाने में त्रुटि' : 'Error creating case');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
+  const handleSubDepartmentClick = (subDeptId: string) => {
+    navigate(`/all-cases/${subDeptId}`);
+  };
+
+  const handleBackToCases = () => {
+    if (formData.subDepartment) {
+      navigate(`/all-cases/${formData.subDepartment}`);
+    } else {
+      navigate('/dashboard');
+    }
+  };
+
+  // Get available sub-departments for selected department
+  const availableSubDepartments = formData.department 
+    ? subDepartments.filter(sub => sub.departmentId === parseInt(formData.department))
+    : [];
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-jansunwayi-blue"></div>
+          <span className="ml-3 text-jansunwayi-darkgray">
+            {currentLang === 'hi' ? 'डेटा लोड हो रहा है...' : 'Loading data...'}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-jansunwayi-navy mb-6">{t.title}</h1>
+    <div className="container mx-auto px-4 py-6">
+      {/* Header */}
+      <div className="mb-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-jansunwayi-navy">{t.title}</h1>
+          <Button onClick={handleBackToCases} variant="outline">
+            {t.backToCases}
+          </Button>
+        </div>
+      </div>
+
       <Card className="p-6">
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Case Number */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t.caseNumber}
-              </label>
+              <label className="block mb-1 font-medium">{t.caseNumber} *</label>
               <input
                 type="text"
                 name="caseNumber"
                 value={formData.caseNumber}
                 onChange={handleChange}
-                className="input-field"
-                placeholder="00125"
+                required
+                className="input-field w-full"
+                placeholder={currentLang === 'hi' ? 'मामला संख्या दर्ज करें' : 'Enter case number'}
               />
             </div>
+
             {/* Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t.name}
-              </label>
+              <label className="block mb-1 font-medium">{t.name} *</label>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="input-field"
+                required
+                className="input-field w-full"
+                placeholder={currentLang === 'hi' ? 'नाम दर्ज करें' : 'Enter name'}
               />
             </div>
+
             {/* Filing Date */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t.filingDate}
-              </label>
+              <label className="block mb-1 font-medium">{t.filingDate} *</label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-full justify-start text-left font-normal"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !formData.filingDate && "text-muted-foreground"
+                    )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formData.filingDate ? (
-                      format(formData.filingDate, "PPP")
-                    ) : (
-                      <span>{t.selectDate}</span>
-                    )}
+                    {formData.filingDate ? format(formData.filingDate, "PPP") : t.selectDate}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0">
                   <Calendar
                     mode="single"
-                    selected={formData.filingDate || undefined}
+                    selected={formData.filingDate}
                     onSelect={(date) => setFormData(prev => ({ ...prev, filingDate: date }))}
                     initialFocus
-                    className={cn("p-3 pointer-events-auto")}
                   />
                 </PopoverContent>
               </Popover>
             </div>
+
             {/* Petition Number */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t.petitionNumber}
-              </label>
+              <label className="block mb-1 font-medium">{t.petitionNumber} *</label>
               <input
                 type="text"
                 name="petitionNumber"
                 value={formData.petitionNumber}
                 onChange={handleChange}
-                className="input-field"
+                required
+                className="input-field w-full"
+                placeholder={currentLang === 'hi' ? 'रीट संख्या दर्ज करें' : 'Enter petition number'}
               />
             </div>
+
             {/* Notice Number */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t.noticeNumber}
-              </label>
+              <label className="block mb-1 font-medium">{t.noticeNumber}</label>
               <input
                 type="text"
                 name="noticeNumber"
                 value={formData.noticeNumber}
                 onChange={handleChange}
-                className="input-field"
+                className="input-field w-full"
+                placeholder={currentLang === 'hi' ? 'नोटिस संख्या दर्ज करें' : 'Enter notice number'}
               />
             </div>
+
             {/* Writ Type */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t.writType}
-              </label>
-              <input
-                type="text"
+              <label className="block mb-1 font-medium">{t.writType}</label>
+              <select
                 name="writType"
                 value={formData.writType}
                 onChange={handleChange}
-                className="input-field"
-                placeholder={t.selectWritType}
-              />
+                className="input-field w-full"
+              >
+                <option value="">{t.selectWritType}</option>
+                <option value="writ">Writ</option>
+                <option value="pil">PIL</option>
+                <option value="civil">Civil</option>
+                <option value="criminal">Criminal</option>
+              </select>
             </div>
+
             {/* Department */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t.department}
-              </label>
+              <label className="block mb-1 font-medium">{t.department} *</label>
               <select
                 name="department"
                 value={formData.department}
                 onChange={handleChange}
-                className="input-field"
+                required
+                className="input-field w-full"
               >
                 <option value="">{t.selectDepartment}</option>
-                {departments.map((dept) => (
+                {departments.map(dept => (
                   <option key={dept.id} value={dept.id}>
                     {currentLang === 'hi' ? dept.name_hi : dept.name_en}
                   </option>
                 ))}
               </select>
             </div>
-            {/* Sub Department */}
-            {formData.department && subDepartmentsMap[Number(formData.department)] && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {currentLang === 'hi' ? 'उप विभाग' : 'Sub Department'}
-                </label>
-                <select
-                  name="subDepartment"
-                  value={formData.subDepartment}
-                  onChange={handleChange}
-                  className="input-field"
-                >
-                  <option value="">{currentLang === 'hi' ? 'उप विभाग चुनें' : 'Select sub department'}</option>
-                  {subDepartmentsMap[Number(formData.department)].map((sub) => (
-                    <option key={sub.id} value={sub.id}>
-                      {currentLang === 'hi' ? sub.name_hi : sub.name_en}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+
+            {/* Sub-Department */}
+            <div>
+              <label className="block mb-1 font-medium">{t.subDepartment}</label>
+              <select
+                name="subDepartment"
+                value={formData.subDepartment}
+                onChange={handleChange}
+                className="input-field w-full"
+                disabled={!formData.department}
+              >
+                <option value="">{t.selectSubDepartment}</option>
+                {availableSubDepartments.map(subDept => (
+                  <option key={subDept._id || subDept.id} value={subDept._id || subDept.id}>
+                    {currentLang === 'hi' ? subDept.name_hi : subDept.name_en}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {/* Affidavit Due Date */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t.affidavitDueDate}
-              </label>
+              <label className="block mb-1 font-medium">{t.affidavitDueDate}</label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-full justify-start text-left font-normal"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !formData.affidavitDueDate && "text-muted-foreground"
+                    )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formData.affidavitDueDate ? (
-                      format(formData.affidavitDueDate, "PPP")
-                    ) : (
-                      <span>{t.selectDate}</span>
-                    )}
+                    {formData.affidavitDueDate ? format(formData.affidavitDueDate, "PPP") : t.selectDate}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0">
                   <Calendar
                     mode="single"
-                    selected={formData.affidavitDueDate || undefined}
+                    selected={formData.affidavitDueDate}
                     onSelect={(date) => setFormData(prev => ({ ...prev, affidavitDueDate: date }))}
                     initialFocus
-                    className={cn("p-3 pointer-events-auto")}
                   />
                 </PopoverContent>
               </Popover>
             </div>
+
             {/* Affidavit Submission Date */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t.affidavitSubmissionDate}
-              </label>
+              <label className="block mb-1 font-medium">{t.affidavitSubmissionDate}</label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-full justify-start text-left font-normal"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !formData.affidavitSubmissionDate && "text-muted-foreground"
+                    )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formData.affidavitSubmissionDate ? (
-                      format(formData.affidavitSubmissionDate, "PPP")
-                    ) : (
-                      <span>{t.selectDate}</span>
-                    )}
+                    {formData.affidavitSubmissionDate ? format(formData.affidavitSubmissionDate, "PPP") : t.selectDate}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0">
                   <Calendar
                     mode="single"
-                    selected={formData.affidavitSubmissionDate || undefined}
+                    selected={formData.affidavitSubmissionDate}
                     onSelect={(date) => setFormData(prev => ({ ...prev, affidavitSubmissionDate: date }))}
                     initialFocus
-                    className={cn("p-3 pointer-events-auto")}
                   />
                 </PopoverContent>
               </Popover>
             </div>
           </div>
-          {/* Counter Affidavit Instruction */}
-          <div className="col-span-full">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t.counterAffidavitinstruction}
-            </label>
-            <div className="flex items-center space-x-2">
-              <label className="text-sm font-medium">
-                {t.isthecounteraffidavittobefiledornot}
+
+          {/* Counter Affidavit Required */}
+          <div className="mt-6">
+            <label className="block mb-2 font-medium">{t.counterAffidavitinstruction}</label>
+            <div className="flex gap-4">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="counterAffidavitRequired"
+                  value="true"
+                  checked={formData.counterAffidavitRequired === true}
+                  onChange={() => setFormData(prev => ({ ...prev, counterAffidavitRequired: true }))}
+                  className="mr-2"
+                />
+                {t.yes}
               </label>
-              <div className="flex items-center space-x-4">
-                <button
-                  type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, counterAffidavitRequired: true }))}
-                  className={`px-4 py-2 rounded-md ${formData.counterAffidavitRequired ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-                >
-                  {t.yes}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, counterAffidavitRequired: false }))}
-                  className={`px-4 py-2 rounded-md ${!formData.counterAffidavitRequired ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-                >
-                  {t.no}
-                </button>
-              </div>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="counterAffidavitRequired"
+                  value="false"
+                  checked={formData.counterAffidavitRequired === false}
+                  onChange={() => setFormData(prev => ({ ...prev, counterAffidavitRequired: false }))}
+                  className="mr-2"
+                />
+                {t.no}
+              </label>
             </div>
           </div>
-          <div className="mt-8 flex justify-end space-x-4">
+
+          {/* Form Actions */}
+          <div className="flex justify-end gap-4 mt-8">
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate('/dashboard')}
+              onClick={handleBackToCases}
             >
               {t.cancel}
             </Button>
-            <Button type="submit">
-              {t.save}
+            <Button
+              type="submit"
+              className="btn-primary"
+              disabled={submitting}
+            >
+              {submitting 
+                ? (currentLang === 'hi' ? 'सहेज रहा है...' : 'Saving...') 
+                : t.save
+              }
             </Button>
           </div>
         </form>

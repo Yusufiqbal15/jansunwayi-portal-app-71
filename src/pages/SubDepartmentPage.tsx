@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
-import { generateMockCases, translations, isWithinDays } from '@/utils/departmentUtils';
+import { generateMockCases, translations } from '@/utils/departmentUtils';
 import { fetchSubDepartments, fetchDepartments } from '@/lib/api';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Eye, Plus } from 'lucide-react';
 
 const SubDepartmentPage: React.FC = () => {
   const { currentLang } = useApp();
   const { subDepartmentId } = useParams<{ subDepartmentId: string }>();
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const navigate = useNavigate();
   const [subDepartments, setSubDepartments] = useState<any[]>([]);
   const [departments, setDepartments] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -39,25 +39,21 @@ const SubDepartmentPage: React.FC = () => {
       setDepartments(deptsData);
     } catch (error) {
       console.error('Error fetching data:', error);
-      // Fallback to static data
       setSubDepartments([]);
       setDepartments([
         { id: 1, name_en: "Administration Department", name_hi: "प्रशासन विभाग" },
         { id: 2, name_en: "Development department", name_hi: "विकास विभाग" },
-        // ... add more static departments as fallback
       ]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Get the current sub-department
   const subDepartment = subDepartments.find(subDept => 
     subDept.id === Number(subDepartmentId) || subDept._id === subDepartmentId
   );
   
   const cases = generateMockCases(Number(subDepartmentId));
-  
   const t = translations[currentLang];
 
   const validateEmail = (email: string) => {
@@ -75,7 +71,6 @@ const SubDepartmentPage: React.FC = () => {
       return;
     }
     setSending(true);
-    // Mock sending email (replace with real API call)
     await new Promise((resolve) => setTimeout(resolve, 1000));
     setSending(false);
     setShowEmailDialog(false);
@@ -88,10 +83,31 @@ const SubDepartmentPage: React.FC = () => {
     setSelectedCaseId(null);
   };
 
+  const handleViewAllCases = () => {
+    navigate(`/all-cases/${subDepartmentId}`);
+  };
+
+  const handleAddCase = () => {
+    navigate(`/add-case?subDepartment=${subDepartmentId}`);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-jansunwayi-blue"></div>
+        <span className="ml-3 text-jansunwayi-darkgray">
+          {currentLang === 'hi' ? 'डेटा लोड हो रहा है...' : 'Loading data...'}
+        </span>
+      </div>
+    );
+  }
+
   if (!subDepartment) {
     return (
       <div className="flex justify-center items-center h-64">
-        <p className="text-jansunwayi-darkgray">Sub-department not found</p>
+        <p className="text-jansunwayi-darkgray">
+          {currentLang === 'hi' ? 'उप-विभाग नहीं मिला' : 'Sub-department not found'}
+        </p>
       </div>
     );
   }
@@ -99,12 +115,28 @@ const SubDepartmentPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-jansunwayi-navy">
-          {currentLang === 'hi' ? subDepartment.name_hi : subDepartment.name_en}
-        </h1>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-jansunwayi-navy">
+              {currentLang === 'hi' ? subDepartment.name_hi : subDepartment.name_en}
+            </h1>
+            <p className="text-jansunwayi-darkgray mt-2">
+              {currentLang === 'hi' ? subDepartment.name_en : subDepartment.name_hi}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={handleViewAllCases} className="btn-primary">
+              <Eye className="h-4 w-4 mr-2" />
+              {currentLang === 'hi' ? 'सभी मामले देखें' : 'View All Cases'}
+            </Button>
+            <Button onClick={handleAddCase} variant="outline">
+              <Plus className="h-4 w-4 mr-2" />
+              {currentLang === 'hi' ? 'मामला जोड़ें' : 'Add Case'}
+            </Button>
+          </div>
+        </div>
       </div>
       
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card className="bg-jansunwayi-blue text-white">
           <div className="p-6 text-center">
@@ -132,17 +164,21 @@ const SubDepartmentPage: React.FC = () => {
         </Card>
       </div>
       
-      {/* Cases Table */}
       <Card className="p-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold text-jansunwayi-navy">
             {t.recentCases}
           </h2>
-          <Link to="/add-case">
-            <Button className="btn-primary">
-              {t.addNewCase}
+          <div className="flex gap-2">
+            <Button onClick={handleViewAllCases} variant="outline">
+              <Eye className="h-4 w-4 mr-2" />
+              {currentLang === 'hi' ? 'सभी मामले देखें' : 'View All Cases'}
             </Button>
-          </Link>
+            <Button onClick={handleAddCase} className="btn-primary">
+              <Plus className="h-4 w-4 mr-2" />
+              {currentLang === 'hi' ? 'मामला जोड़ें' : 'Add Case'}
+            </Button>
+          </div>
         </div>
         
         <div className="overflow-x-auto">
@@ -167,8 +203,7 @@ const SubDepartmentPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {cases.map((caseItem) => {
-                // Show reminder button for all pending cases
+              {cases.slice(0, 5).map((caseItem) => {
                 const needsReminder = caseItem.status === 'Pending';
                 
                 return (
@@ -195,62 +230,14 @@ const SubDepartmentPage: React.FC = () => {
                     </td>
                     <td className="px-3 py-2 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
-                        <Link to={`/case/${caseItem.id}`}>
-                          <Button variant="outline" size="sm">
-                            {t.viewDetails}
-                          </Button>
-                        </Link>
-
-                        {/* Print Button */}
                         <Button
-                          variant="outline"
+                          onClick={() => handleSendReminderClick(caseItem.id.toString())}
                           size="sm"
-                          onClick={() => {
-                            // Minimal valid blank PDF content
-                            const pdfData = `%PDF-1.1
-1 0 obj
-<< /Type /Catalog /Pages 2 0 R >>
-endobj
-2 0 obj
-<< /Type /Pages /Kids [3 0 R] /Count 1 >>
-endobj
-3 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] >>
-endobj
-xref
-0 4
-0000000000 65535 f 
-0000000010 00000 n 
-0000000061 00000 n 
-0000000116 00000 n 
-trailer
-<< /Root 1 0 R /Size 4 >>
-startxref
-178
-%%EOF`;
-                            const blob = new Blob([pdfData], { type: 'application/pdf' });
-                            const url = window.URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = 'blank.pdf';
-                            document.body.appendChild(a);
-                            a.click();
-                            document.body.removeChild(a);
-                            window.URL.revokeObjectURL(url);
-                          }}
+                          variant="outline"
+                          disabled={caseItem.status === 'Resolved'}
                         >
-                          {currentLang === 'hi' ? 'प्रिंट' : 'Print'}
+                          {currentLang === 'hi' ? 'अनुस्मारक' : 'Reminder'}
                         </Button>
-
-                        {needsReminder && (
-                          <Button 
-                            variant="destructive" 
-                            size="sm" 
-                            onClick={() => handleSendReminderClick(caseItem.id)}
-                          >
-                            {t.sendReminder}
-                          </Button>
-                        )}
                       </div>
                     </td>
                   </tr>
@@ -259,31 +246,59 @@ startxref
             </tbody>
           </table>
         </div>
+        
+        {cases.length > 5 && (
+          <div className="mt-4 text-center">
+            <Button onClick={handleViewAllCases} variant="outline">
+              {currentLang === 'hi' ? 'सभी मामले देखें' : 'View All Cases'}
+            </Button>
+          </div>
+        )}
       </Card>
-      {/* Email Dialog for Reminder */}
+
       <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{currentLang === 'hi' ? 'ईमेल पता दर्ज करें' : 'Enter Email Address'}</DialogTitle>
+            <DialogTitle>
+              {currentLang === 'hi' ? 'ईमेल अनुस्मारक भेजें' : 'Send Email Reminder'}
+            </DialogTitle>
             <DialogDescription>
-              {currentLang === 'hi'
-                ? 'कृपया वह ईमेल पता दर्ज करें जिस पर आप रिमाइंडर भेजना चाहते हैं।'
-                : 'Please enter the email address where you want to send the reminder.'}
+              {currentLang === 'hi' 
+                ? `मामला ${selectedCaseId} के लिए अनुस्मारक ईमेल भेजें` 
+                : `Send reminder email for case ${selectedCaseId}`
+              }
             </DialogDescription>
           </DialogHeader>
-          <Input
-            type="email"
-            placeholder={currentLang === 'hi' ? 'ईमेल पता' : 'Email address'}
-            value={reminderEmail}
-            onChange={e => setReminderEmail(e.target.value)}
-            disabled={sending}
-          />
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                {currentLang === 'hi' ? 'ईमेल पता' : 'Email address'}
+              </label>
+              <Input
+                type="email"
+                placeholder={currentLang === 'hi' ? 'ईमेल पता' : 'Email address'}
+                value={reminderEmail}
+                onChange={e => setReminderEmail(e.target.value)}
+                disabled={sending}
+              />
+            </div>
+          </div>
           <DialogFooter>
-            <Button onClick={handleSendEmail} disabled={sending || !reminderEmail}>
-              {sending ? (currentLang === 'hi' ? 'भेजा जा रहा है...' : 'Sending...') : (currentLang === 'hi' ? 'भेजें' : 'Send')}
-            </Button>
-            <Button variant="outline" onClick={() => setShowEmailDialog(false)} disabled={sending}>
+            <Button
+              variant="outline"
+              onClick={() => setShowEmailDialog(false)}
+              disabled={sending}
+            >
               {currentLang === 'hi' ? 'रद्द करें' : 'Cancel'}
+            </Button>
+            <Button
+              onClick={handleSendEmail}
+              disabled={sending || !reminderEmail}
+            >
+              {sending 
+                ? (currentLang === 'hi' ? 'भेज रहा है...' : 'Sending...') 
+                : (currentLang === 'hi' ? 'भेजें' : 'Send')
+              }
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -292,4 +307,4 @@ startxref
   );
 };
 
-export default SubDepartmentPage;
+export default SubDepartmentPage; 

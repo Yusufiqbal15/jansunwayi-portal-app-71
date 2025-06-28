@@ -516,4 +516,7 @@ app.listen(PORT, () => {
   console.log(`- PUT /cases/:id - Update case`);
   console.log(`- DELETE /cases/:id - Delete case`);
   console.log(`- GET /sub-departments - Get sub-departments`);
-  console.log(`
+  console.log(`- POST /sub-departments - Create sub-department`);
+  console.log(`- GET /departments - Get departments`);
+  console.log(`- POST /email-reminders - Send email reminder`);
+});

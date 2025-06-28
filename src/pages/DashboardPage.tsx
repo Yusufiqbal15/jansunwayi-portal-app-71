@@ -141,9 +141,9 @@ const DashboardPage: React.FC = () => {
               <Button
                 onClick={async () => {
                   try {
-                    const subDepts = await fetchSubDepartments(1);
-                    console.log('Dashboard: Test fetch sub-departments for dept 1:', subDepts);
-                    toast.success(`Found ${subDepts.length} sub-departments for department 1`);
+                    const subDepts = await fetchSubDepartments();
+                    console.log('Dashboard: Test fetch sub-departments:', subDepts);
+                    toast.success(`Found ${subDepts.length} sub-departments`);
                   } catch (error) {
                     console.error('Dashboard: Test fetch failed:', error);
                     toast.error('Test fetch failed');
