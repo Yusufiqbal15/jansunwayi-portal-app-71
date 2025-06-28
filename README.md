@@ -83,49 +83,25 @@ npm run dev
 
 Visit [http://localhost:5173](http://localhost:5173) to view the app.
 
+### Backend Setup
+
+1. Go to the `server` directory:
+   ```sh
+   cd server
+   ```
+2. Install backend dependencies:
+   ```sh
+   npm install express mongoose cors
+   ```
+3. Start the backend server:
+   ```sh
+   node index.js
+   ```
+
+The backend will run on port 5000 by default.
+
 ---
 
 ## 📂 Project Structure
 
 ```
-src/
-  components/         # Reusable UI and feature components
-    department/       # Department and sub-department components
-    ui/               # UI primitives (Card, Button, Dialog, etc.)
-  contexts/           # React context providers
-  hooks/              # Custom React hooks
-  lib/                # Utility libraries
-  pages/              # Main app pages (Dashboard, Department, Case Details, etc.)
-  utils/              # Utility functions and translations
-public/               # Static assets (favicon, images)
-```
-
----
-
-## 🤝 Contributing
-
-1. Fork this repo
-2. Create your feature branch (`git checkout -b feature/YourFeature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin feature/YourFeature`)
-5. Create a new Pull Request
-
----
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
----
-
-## 🙏 Acknowledgements
-
-- [shadcn/ui](https://ui.shadcn.com/)
-- [Radix UI](https://www.radix-ui.com/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Vite](https://vitejs.dev/)
-- [React](https://react.dev/)
-
----
-
-> _Made with ❤️ for government transparency and efficiency!_ 

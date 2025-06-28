@@ -17,73 +17,157 @@ export interface Case {
   reminderSentCount: number;
 }
 
-// In a real app, replace this with your actual API call
-// Example mock fetching function
-const fetchCases = async (): Promise<Case[]> => {
-  console.log("Fetching cases...");
+// Cache for departments and sub-departments
+let departmentsCache: any[] | null = null;
+let subDepartmentsCache: any[] | null = null;
+let cacheTimestamp = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-  // --------------------------------------------------------------
-  // --- REPLACE THE MOCK DATA BELOW WITH YOUR REAL API CALL ---
-  // --------------------------------------------------------------
-
-  // Example using fetch (adjust the URL and headers as needed)
-  /*
+export const fetchCases = async () => {
   try {
-    const response = await fetch('/api/cases'); // Replace with your actual API endpoint
+    const response = await fetch('http://localhost:5000/cases');
     if (!response.ok) {
       throw new Error(`Error fetching cases: ${response.statusText}`);
     }
-    const data = await response.json();
-    // You might need to transform the data structure if it doesn't exactly match the 'Case' interface
-    return data as Case[]; // Assuming your API returns an array matching the Case type
+    return await response.json();
   } catch (error) {
     console.error("API call failed:", error);
-    throw error; // Re-throw to be caught by react-query
+    throw error;
   }
-  */
-
-  // --------------------------------------------------------------
-  // --- CURRENT MOCK DATA (REMOVE THIS IN REAL IMPLEMENTATION) ---
-  // --------------------------------------------------------------
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-
-  // Return mock data
-  const today = new Date();
-  const cases: Case[] = [];
-
-  // Generate mock cases for departments
-  for (let i = 1; i <= 48; i++) {
-    const departmentId = i;
-    const totalForDept = Math.floor(Math.random() * 30); // Random cases per department
-
-    for (let j = 0; j < totalForDept; j++) {
-      const status = Math.random() > 0.4 ? 'Pending' : 'Resolved'; // More pending cases
-      const filingDate = new Date(today);
-      filingDate.setDate(today.getDate() - Math.floor(Math.random() * 365)); // Random filing date
-
-      cases.push({
-        id: `${departmentId}-${j}`,
-        caseNumber: `CASE-${departmentId}-${j}`,
-        name: `Case for Dept ${departmentId}-${j}`,
-        filingDate,
-        petitionNumber: `PET-${departmentId}-${j}`,
-        noticeNumber: `NOTICE-${departmentId}-${j}`,
-        writType: 'writ', // simplified
-        department: departmentId,
-        status,
-        hearingDate: status === 'Pending' && Math.random() > 0.5 ? new Date(today.setDate(today.getDate() + Math.floor(Math.random() * 30))) : null,
-        reminderSent: false,
-        affidavitDueDate: null,
-        affidavitSubmissionDate: null,
-        counterAffidavitRequired: false,
-        reminderSentCount: 0,
-      });
-    }
-  }
-
-  return cases;
-  // --------------------------------------------------------------
 };
 
-export { fetchCases }; 
+export const saveSubDepartment = async (departmentId: number, subDeptNameEn: string, subDeptNameHi: string) => {
+  try {
+    console.log('API: Saving sub-department with data:', { departmentId, subDeptNameEn, subDeptNameHi });
+    
+    const response = await fetch('http://localhost:5000/sub-departments', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        departmentId,
+        subDeptNameEn,
+        subDeptNameHi
+      }),
+    });
+    
+    console.log('API: Response status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API: Error response:', errorText);
+      throw new Error(`Error saving sub-department: ${response.statusText} - ${errorText}`);
+    }
+    
+    const result = await response.json();
+    console.log('API: Success response:', result);
+    
+    // Clear cache immediately when new data is added
+    subDepartmentsCache = null;
+    cacheTimestamp = 0; // Force cache refresh
+    
+    return result;
+  } catch (error) {
+    console.error("API: saveSubDepartment failed:", error);
+    throw error;
+  }
+};
+
+export const fetchSubDepartments = async (departmentId?: number) => {
+  try {
+    console.log('API: Fetching sub-departments for departmentId:', departmentId);
+    
+    // Force clear cache for debugging
+    subDepartmentsCache = null;
+    cacheTimestamp = 0;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+
+    const url = departmentId 
+      ? `http://localhost:5000/sub-departments?departmentId=${departmentId}`
+      : 'http://localhost:5000/sub-departments';
+    
+    console.log('API: Fetching from URL:', url);
+    
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    
+    console.log('API: Response status:', response.status);
+    
+    if (!response.ok) {
+      throw new Error(`Error fetching sub-departments: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log('API: Received sub-departments data:', data);
+    
+    subDepartmentsCache = data;
+    cacheTimestamp = Date.now();
+    
+    return data;
+  } catch (error) {
+    console.error("API: fetchSubDepartments failed:", error);
+    // Return cached data if available, even if expired
+    if (subDepartmentsCache) {
+      if (departmentId) {
+        return subDepartmentsCache.filter(sub => sub.departmentId === departmentId);
+      }
+      return subDepartmentsCache;
+    }
+    throw error;
+  }
+};
+
+// Add department API functions
+export const fetchDepartments = async () => {
+  try {
+    // Check cache first
+    const now = Date.now();
+    if (departmentsCache && (now - cacheTimestamp) < CACHE_DURATION) {
+      return departmentsCache;
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+
+    const response = await fetch('http://localhost:5000/departments', { signal: controller.signal });
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      throw new Error(`Error fetching departments: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    departmentsCache = data;
+    cacheTimestamp = now;
+    
+    return data;
+  } catch (error) {
+    console.error("API call failed:", error);
+    // Return cached data if available, even if expired
+    if (departmentsCache) {
+      return departmentsCache;
+    }
+    throw error;
+  }
+};
+
+export const fetchDepartmentById = async (id: number) => {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+
+    const response = await fetch(`http://localhost:5000/departments/${id}`, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      throw new Error(`Error fetching department: ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("API call failed:", error);
+    throw error;
+  }
+}; 

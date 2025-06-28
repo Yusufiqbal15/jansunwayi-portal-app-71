@@ -1,26 +1,62 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { generateMockCases, translations, isWithinDays } from '@/utils/departmentUtils';
-import { subDepartments } from '@/utils/departmentUtils';
+import { fetchSubDepartments, fetchDepartments } from '@/lib/api';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
 
 const SubDepartmentPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
   const { currentLang } = useApp();
+  const { subDepartmentId } = useParams<{ subDepartmentId: string }>();
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [subDepartments, setSubDepartments] = useState<any[]>([]);
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [reminderEmail, setReminderEmail] = useState('');
   const [sending, setSending] = useState(false);
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [subDeptsData, deptsData] = await Promise.all([
+        fetchSubDepartments(),
+        fetchDepartments()
+      ]);
+      
+      setSubDepartments(subDeptsData);
+      setDepartments(deptsData);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      // Fallback to static data
+      setSubDepartments([]);
+      setDepartments([
+        { id: 1, name_en: "Administration Department", name_hi: "प्रशासन विभाग" },
+        { id: 2, name_en: "Development department", name_hi: "विकास विभाग" },
+        // ... add more static departments as fallback
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Get the current sub-department
+  const subDepartment = subDepartments.find(subDept => 
+    subDept.id === Number(subDepartmentId) || subDept._id === subDepartmentId
+  );
   
-  const subDepartment = subDepartments.find(subDept => subDept.id === Number(id));
-  const cases = generateMockCases(Number(id));
+  const cases = generateMockCases(Number(subDepartmentId));
   
   const t = translations[currentLang];
 

@@ -18,6 +18,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage
       title: "Ayodhya Court Case Portal",
       home: "Home",
       reports: "Reports",
+      subDepartments: "Sub-Departments",
       logout: "Logout",
       login: "Login",
       Print: "Print"
@@ -26,6 +27,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage
       title: "डीएम जनसुनवाई पोर्टल",
       home: "होम",
       reports: "रिपोर्ट्स",
+      subDepartments: "उप-विभाग",
       logout: "लॉगआउट",
       login: "लॉगिन"
     }
@@ -54,6 +56,11 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage
                     <li>
                       <Link to="/dashboard" className="hover:text-jansunwayi-gray bx1 transition-colors">
                         {t.home}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/sub-departments" className="hover:text-jansunwayi-gray transition-colors">
+                        {t.subDepartments}
                       </Link>
                     </li>
                     <li className="relative group">

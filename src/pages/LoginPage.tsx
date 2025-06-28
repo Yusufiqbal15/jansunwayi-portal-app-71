@@ -4,8 +4,6 @@ import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { auth } from '@/components/firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
 
 const LoginPage: React.FC = () => {
   const { login, currentLang } = useApp();
@@ -59,8 +57,7 @@ const LoginPage: React.FC = () => {
     }
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      login(email, password, auth);
+      login(email, password);
       toast.success(t.loginSuccess);
       navigate('/reports'); // Redirect to reports page after successful login
     } catch (error) {

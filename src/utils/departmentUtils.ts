@@ -1,6 +1,3 @@
-import { db } from '@/components/firebase';
-import { collection, setDoc, doc } from "firebase/firestore";
-
 // Helper function to check if a date is within specified days from now
 export const isWithinDays = (date: Date, days: number): boolean => {
   if (!date) return false;
@@ -84,9 +81,6 @@ export const departments = [
   { id: 47, name_en: "UPPCL U.P. Project Corporation Ltd. Construction Unit-11 Ayodhya", name_hi: "यूपीपीसीएल उ0 प्र0 प्रोजेक्ट कारपोरेशन लि0 निर्माण इकाई-11 अयोध्या।" },
   { id: 48, name_en: "Other Miscellaneous Departments", name_hi: "अन्य विविध विभाग" },
   { id: 49, name_en: "Nagar Nigam Ayodhya", name_hi: "नगर निगम अयोध्या" },
-
-
-
 ];
 
 // Sub-departments for Administration Department
@@ -170,8 +164,25 @@ export type TranslationType = typeof translations.en;
 
 // Firestore upload function
 export const uploadDepartmentsToFirestore = async (departments: any[]) => {
-  const departmentsCollection = collection(db, "Departments");
-  for (const dept of departments) {
-    await setDoc(doc(departmentsCollection, dept.id.toString()), dept);
+  // This function is removed as per the instructions
+};
+
+// Function to fetch sub-departments from database and merge with static data
+export const getSubDepartmentsForDepartment = async (departmentId: number) => {
+  try {
+    const response = await fetch(`http://localhost:5000/sub-departments?departmentId=${departmentId}`);
+    if (response.ok) {
+      const dbSubDepts = await response.json();
+      // Merge with static sub-departments (for department 1)
+      if (departmentId === 1) {
+        return [...subDepartments, ...dbSubDepts];
+      }
+      return dbSubDepts;
+    }
+  } catch (error) {
+    console.error('Error fetching sub-departments:', error);
   }
+  
+  // Return static data as fallback
+  return departmentId === 1 ? subDepartments : [];
 };

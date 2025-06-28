@@ -4,7 +4,7 @@ interface AddSubDepartmentFormProps {
   departments: { id: number; name_en: string; name_hi: string }[];
   currentLang: 'en' | 'hi';
   onClose: () => void;
-  onSubmit: (data: { departmentId: string; subDeptNameEn: string; subDeptNameHi: string }) => void;
+  onSubmit: (departmentId: number, subDeptNameEn: string, subDeptNameHi: string) => void;
 }
 
 const AddSubDepartmentForm: React.FC<AddSubDepartmentFormProps> = ({
@@ -19,7 +19,14 @@ const AddSubDepartmentForm: React.FC<AddSubDepartmentFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ departmentId, subDeptNameEn, subDeptNameHi });
+    console.log('Form submitted with data:', { departmentId, subDeptNameEn, subDeptNameHi });
+    
+    if (!departmentId || !subDeptNameEn || !subDeptNameHi) {
+      console.error('Form validation failed: missing required fields');
+      return;
+    }
+    
+    onSubmit(parseInt(departmentId), subDeptNameEn, subDeptNameHi);
     setDepartmentId('');
     setSubDeptNameEn('');
     setSubDeptNameHi('');
@@ -56,7 +63,7 @@ const AddSubDepartmentForm: React.FC<AddSubDepartmentFormProps> = ({
           </div>
           <div>
             <label className="block mb-1 font-medium">
-              {currentLang === 'hi' ? 'उप विभाग (अंग्रेज़ी)' : 'Sub Department (English)'}
+              {currentLang === 'hi' ? 'उप विभाग (अंग्रे़ी)' : 'Sub Department (English)'}
             </label>
             <input
               type="text"
@@ -64,10 +71,23 @@ const AddSubDepartmentForm: React.FC<AddSubDepartmentFormProps> = ({
               onChange={e => setSubDeptNameEn(e.target.value)}
               required
               className="input-field w-full"
-              placeholder={currentLang === 'hi' ? 'उप विभाग नाम (अंग्रेज़ी)' : 'Sub Department Name (English)'}
+              placeholder={currentLang === 'hi' ? 'उप विभाग नाम (अंग्रे़ी)' : 'Sub Department Name (English)'}
             />
           </div>
-                                                                                              <div className="flex justify-end gap-2">
+          <div>
+            <label className="block mb-1 font-medium">
+              {currentLang === 'hi' ? 'उप विभाग (हिंदी)' : 'Sub Department (Hindi)'}
+            </label>
+            <input
+              type="text"
+              value={subDeptNameHi}
+              onChange={e => setSubDeptNameHi(e.target.value)}
+              required
+              className="input-field w-full"
+              placeholder={currentLang === 'hi' ? 'उप विभाग नाम (हिंदी)' : 'Sub Department Name (Hindi)'}
+            />
+          </div>
+          <div className="flex justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
