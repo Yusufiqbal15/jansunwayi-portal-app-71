@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Search, Building2, ArrowLeft, Plus, List, Loader2 } from 'lucide-react';
 import AddSubDepartmentForm from '@/components/AddSubDepartmentForm';
 import { uploadDepartmentsToFirestore } from '@/utils/departmentUtils';
 import { saveSubDepartment, fetchDepartments, fetchSubDepartments, fetchCases } from '@/lib/api';
@@ -133,12 +133,15 @@ const DashboardPage: React.FC = () => {
     const deptName = currentLang === 'hi' ? selectedDept.name_hi : selectedDept.name_en;
 
     return (
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex justify-between items-center mb-6">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex justify-between items-center mb-6 bg-white rounded-lg p-4 shadow-sm">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">
-              {deptName}
-            </h1>
+            <div className="flex items-center gap-2">
+              <Building2 className="h-5 w-5 text-blue-600" />
+              <h1 className="text-2xl font-bold text-gray-800">
+                {deptName}
+              </h1>
+            </div>
             <p className="text-gray-600">
               {currentLang === 'hi' ? 'उप-विभाग रिपोर्ट' : 'Sub-Department Reports'}
             </p>
@@ -146,44 +149,49 @@ const DashboardPage: React.FC = () => {
           <Button
             onClick={() => setSelectedDeptId(null)}
             variant="outline"
-            className="px-4 py-2"
+            className="px-4 py-2 flex items-center gap-2 hover:bg-gray-100"
           >
+            <ArrowLeft className="h-4 w-4" />
             {currentLang === 'hi' ? 'वापस' : 'Back'}
           </Button>
         </div>
 
         {(loadingSubDepts || loadingCases) ? (
-          <div className="flex items-center justify-center min-h-[300px]">
-            <div className="text-blue-600 text-lg font-semibold">
-              {currentLang === 'hi' ? 'लोड हो रहा है...' : 'Loading...'}
+          <div className="flex items-center justify-center h-[300px] bg-white rounded-lg shadow-sm">
+            <div className="flex items-center gap-3 text-blue-600">
+              <Loader2 className="h-6 w-6 animate-spin" />
+              <span className="text-lg font-semibold">
+                {currentLang === 'hi' ? 'लोड हो रहा है...' : 'Loading...'}
+              </span>
             </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {subDepartmentStats.map((subDept) => (
-              <Card key={subDept.id} className="overflow-hidden hover:shadow-lg transition-all duration-200">
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold mb-4 text-gray-800 min-h-[3rem]">
+              <Card key={subDept.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 border-t-4 border-blue-500">
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold mb-4 text-gray-800 flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-blue-600" />
                     {subDept.name}
                   </h3>
                   <div className="space-y-3">
-                    <div className="flex justify-between items-center bg-blue-50 p-2 rounded">
+                    <div className="flex justify-between items-center bg-gradient-to-r from-blue-50 to-white p-3 rounded-lg border border-blue-100">
                       <span className="text-blue-700 font-medium">
-                        {currentLang === 'hi' ? 'कुल मामले' : 'Total Cases'}:
+                        {currentLang === 'hi' ? 'कुल मामले' : 'Total Cases'}
                       </span>
-                      <span className="text-blue-700 font-bold">{subDept.total}</span>
+                      <span className="text-xl font-bold text-blue-700">{subDept.total}</span>
                     </div>
-                    <div className="flex justify-between items-center bg-yellow-50 p-2 rounded">
+                    <div className="flex justify-between items-center bg-gradient-to-r from-yellow-50 to-white p-3 rounded-lg border border-yellow-100">
                       <span className="text-yellow-700 font-medium">
-                        {currentLang === 'hi' ? 'लंबित मामले' : 'Pending Cases'}:
+                        {currentLang === 'hi' ? 'लंबित मामले' : 'Pending Cases'}
                       </span>
-                      <span className="text-yellow-700 font-bold">{subDept.pending}</span>
+                      <span className="text-xl font-bold text-yellow-700">{subDept.pending}</span>
                     </div>
-                    <div className="flex justify-between items-center bg-green-50 p-2 rounded">
+                    <div className="flex justify-between items-center bg-gradient-to-r from-green-50 to-white p-3 rounded-lg border border-green-100">
                       <span className="text-green-700 font-medium">
-                        {currentLang === 'hi' ? 'निराकृत मामले' : 'Resolved Cases'}:
+                        {currentLang === 'hi' ? 'निराकृत मामले' : 'Resolved Cases'}
                       </span>
-                      <span className="text-green-700 font-bold">{subDept.resolved}</span>
+                      <span className="text-xl font-bold text-green-700">{subDept.resolved}</span>
                     </div>
                   </div>
                 </div>
@@ -196,23 +204,31 @@ const DashboardPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">
-          {currentLang === 'hi' ? 'डैशबोर्ड' : 'Dashboard'}
-        </h1>
+    <div className="container mx-auto px-4 py-4">
+      <div className="bg-white rounded-lg p-4 shadow-sm mb-6">
+        <div className="flex items-center gap-2 mb-2">
+          <Building2 className="h-6 w-6 text-blue-600" />
+          <h1 className="text-2xl font-bold text-gray-800">
+            {currentLang === 'hi' ? 'डैशबोर्ड' : 'Dashboard'}
+          </h1>
+        </div>
+        <p className="text-gray-600">
+          {currentLang === 'hi' ? 'सभी विभागों की जानकारी' : 'Information for all departments'}
+        </p>
       </div>
 
       {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <span className="ml-3 text-gray-600">
-            {currentLang === 'hi' ? 'डेटा लोड हो रहा है...' : 'Loading data...'}
-          </span>
+        <div className="flex justify-center items-center h-48 bg-white rounded-lg shadow-sm">
+          <div className="flex items-center gap-3 text-blue-600">
+            <Loader2 className="h-6 w-6 animate-spin" />
+            <span className="text-lg font-semibold">
+              {currentLang === 'hi' ? 'डेटा लोड हो रहा है...' : 'Loading data...'}
+            </span>
+          </div>
         </div>
       ) : (
         <>
-          <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 bg-white rounded-lg p-4 shadow-sm">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
@@ -220,18 +236,23 @@ const DashboardPage: React.FC = () => {
                 placeholder={currentLang === 'hi' ? 'विभाग खोजें...' : 'Search departments...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 py-2"
               />
             </div>
             <div className="flex gap-2">
               <Button
                 onClick={() => setShowAddSubDept(true)}
-                className="btn-primary"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 h-auto flex items-center gap-2"
               >
+                <Plus className="h-4 w-4" />
                 {currentLang === 'hi' ? 'उप विभाग जोड़ें' : 'Add Sub Department'}
               </Button>
               <Link to="/sub-departments">
-                <Button variant="outline">
+                <Button 
+                  variant="outline" 
+                  className="px-4 py-2 h-auto flex items-center gap-2 hover:bg-gray-100"
+                >
+                  <List className="h-4 w-4" />
                   {currentLang === 'hi' ? 'सभी उप-विभाग देखें' : 'View All Sub-Departments'}
                 </Button>
               </Link>
@@ -242,15 +263,18 @@ const DashboardPage: React.FC = () => {
             {filteredDepartments.map((department) => (
               <Card 
                 key={department.id} 
-                className="hover:shadow-lg transition-shadow cursor-pointer h-full"
+                className="hover:shadow-lg transition-all duration-300 cursor-pointer group border-t-4 border-blue-500"
                 onClick={() => setSelectedDeptId(department.id)}
               >
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                    {currentLang === 'hi' ? department.name_hi : department.name_en}
-                  </h3>
-                  <p className="text-gray-600">
-                    {currentLang === 'hi' ? 'क्लिक करें उप-विभाग देखने के लिए' : 'Click to view sub-departments'}
+                <div className="p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Building2 className="h-5 w-5 text-blue-600 group-hover:text-blue-700 transition-colors" />
+                    <h3 className="text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">
+                      {currentLang === 'hi' ? department.name_hi : department.name_en}
+                    </h3>
+                  </div>
+                  <p className="text-gray-600 group-hover:text-gray-700 transition-colors text-sm">
+                    {currentLang === 'hi' ? 'विभागीय जानकारी देखने के लिए क्लिक करें' : 'Click to view department information'}
                   </p>
                 </div>
               </Card>
@@ -262,9 +286,8 @@ const DashboardPage: React.FC = () => {
       {showAddSubDept && (
         <AddSubDepartmentForm
           departments={departments}
-          currentLang={currentLang}
-          onClose={() => setShowAddSubDept(false)}
           onSubmit={handleAddSubDepartment}
+          onClose={() => setShowAddSubDept(false)}
         />
       )}
     </div>
