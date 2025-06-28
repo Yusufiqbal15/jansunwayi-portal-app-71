@@ -84,8 +84,8 @@ app.get('/cases', async (req, res) => {
       department, 
       subDepartment, 
       status, 
-      page = 1, 
-      limit = 20,
+      page, 
+      limit,
       search 
     } = req.query;
     
@@ -112,24 +112,25 @@ app.get('/cases', async (req, res) => {
       ];
     }
     
-    const skip = (parseInt(page) - 1) * parseInt(limit);
+    let casesQuery = Case.find(query).populate('subDepartment').sort({ createdAt: -1 });
     
-    const cases = await Case.find(query)
-      .populate('subDepartment')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(parseInt(limit));
+    // Only apply pagination if both page and limit are provided
+    if (page && limit) {
+      const skip = (parseInt(page) - 1) * parseInt(limit);
+      casesQuery = casesQuery.skip(skip).limit(parseInt(limit));
+    }
     
+    const cases = await casesQuery;
     const total = await Case.countDocuments(query);
     
     res.json({
       cases,
-      pagination: {
+      pagination: page && limit ? {
         page: parseInt(page),
         limit: parseInt(limit),
         total,
         pages: Math.ceil(total / parseInt(limit))
-      }
+      } : null
     });
   } catch (err) {
     console.error('Error fetching cases:', err);

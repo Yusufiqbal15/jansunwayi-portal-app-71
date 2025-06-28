@@ -58,10 +58,11 @@ const departments = [
 ];
 
 // Helper to get counts for each department from a list of cases
-function getDepartmentStats(deptId: number, cases: Case[] | undefined) {
+function getDepartmentStats(deptId: number, cases: { cases: Case[] } | undefined) {
   if (!cases) return { total: 0, pending: 0, resolved: 0 };
 
-  const deptCases = cases.filter(c => c.department === deptId);
+  const casesArray = cases.cases || [];
+  const deptCases = casesArray.filter(c => c.department === deptId);
   const total = deptCases.length;
   const pending = deptCases.filter(c => c.status === 'Pending').length;
   const resolved = deptCases.filter(c => c.status === 'Resolved').length;
@@ -77,11 +78,10 @@ const DashboardChart: React.FC<Props> = ({ currentLang }) => {
   const navigate = useNavigate();
 
   // Use react-query to fetch cases
-  const { data: cases, isLoading, error } = useQuery<Case[]>({
+  const { data: cases, isLoading, error } = useQuery<{ cases: Case[] }>({
     queryKey: ['cases'],       // Unique key for this query
     queryFn: fetchCases,      // Function to fetch the data
     staleTime: 5 * 60 * 1000, // Data is considered "fresh" for 5 minutes
-   
   });
 
   const handleClick = (departmentId: number, status: 'total' | 'pending' | 'resolved') => {
@@ -89,16 +89,14 @@ const DashboardChart: React.FC<Props> = ({ currentLang }) => {
   };
 
   // Show SubDepartmentData only for Administration Department (id: 1)
-  if (selectedDeptId === 1) {
+  if (selectedDeptId) {
     return (
       <div>
-        <button
-          onClick={() => setSelectedDeptId(null)}
-          className="mb-4 px-4 py-2 bg-blue-600 text-white rounded"
-        >
-          {currentLang === 'hi' ? 'वापस' : 'Back'}
-        </button>
-        <SubDepartmentData />
+        <SubDepartmentData 
+          departmentId={selectedDeptId}
+          currentLang={currentLang}
+          onBack={() => setSelectedDeptId(null)}
+        />
       </div>
     );
   }

@@ -1,69 +1,98 @@
 import React from 'react';
-import Header from '../Header';
+import { useQuery } from '@tanstack/react-query';
+import { fetchCases, fetchSubDepartments } from '@/lib/api';
 
-const caseData = [
-  { id: 1, name: "Tehsildar Rudauli", total: 15, pending: 9, resolved: 6 },
-  { id: 2, name: "Tehsildar Milkipur", total: 15, pending: 5, resolved: 10 },
-  { id: 3, name: "Tehsildar Sohawal", total: 15, pending: 9, resolved: 6 },
-  { id: 4, name: "Shri Raj Bahadur Verma, Nayab Tehsildar (Survey)", total: 15, pending: 3, resolved: 12 },
-  { id: 5, name: "Shri Ravindra Nath Upadhyay, Nayab Tehsildar (Nazul)", total: 15, pending: 10, resolved: 5 },
-  { id: 6, name: "Sub-District Magistrate, Rudauli", total: 15, pending: 6, resolved: 9 },
-  { id: 7, name: "Sub-District Magistrate, Milkipur", total: 15, pending: 9, resolved: 6 },
-  { id: 8, name: "Sub-District Magistrate, Sohawal", total: 15, pending: 7, resolved: 8 },
-  { id: 9, name: "Assistant Record Officer", total: 15, pending: 6, resolved: 9 },
-  { id: 10, name: "Tehsildar Sadar", total: 15, pending: 11, resolved: 4 },
-  { id: 11, name: "Tehsildar Bikapur", total: 15, pending: 5, resolved: 10 },
-  { id: 12, name: "Addl. District Magistrate (Land Acquisition)", total: 15, pending: 6, resolved: 9 },
-  { id: 13, name: "City Magistrate", total: 15, pending: 11, resolved: 4 },
-  { id: 14, name: "Resident Magistrate", total: 15, pending: 7, resolved: 8 },
-  { id: 15, name: "Deputy Divisional Consolidation", total: 15, pending: 8, resolved: 7 },
-  { id: 16, name: "Sub Divisional Magistrate Sadar", total: 15, pending: 11, resolved: 4 },
-  { id: 17, name: "Sub-District Magistrate, Bikapur", total: 15, pending: 9, resolved: 6 },
-  { id: 18, name: "Chief Development Officer", total: 15, pending: 11, resolved: 4 },
-  { id: 19, name: "Addl. District Magistrate (Finance / Revenue) Ayodhya", total: 15, pending: 6, resolved: 9 },
-  { id: 20, name: "Addl. District Magistrate (City), Ayodhya", total: 15, pending: 4, resolved: 11 },
-  { id: 21, name: "Addl. District Magistrate (Administration)", total: 15, pending: 10, resolved: 5 },
-  { id: 22, name: "Chief Revenue Officer", total: 15, pending: 8, resolved: 7 },
-  { id: 23, name: "Addl. District Magistrate (Law & Order)", total: 15, pending: 4, resolved: 11 },
-];
+interface Props {
+  departmentId: number;
+  currentLang: 'en' | 'hi';
+  onBack: () => void;
+}
 
+const SubDepartmentData: React.FC<Props> = ({ departmentId, currentLang, onBack }) => {
+  // Fetch sub-departments for the selected department
+  const { data: subDepartments, isLoading: loadingSubDepts } = useQuery({
+    queryKey: ['subDepartments', departmentId],
+    queryFn: () => fetchSubDepartments(departmentId),
+  });
 
-const CaseStatsTable = ({ departmentId, currentLang, onBack }: { departmentId: number, currentLang: 'en' | 'hi', onBack: () => void }) => (
-  <div className="relative min-h-[300px] font-bold pt-20">
-    {/* ...other content... */}
-    <button
-      onClick={onBack}
-      className="fixed right-8 bottom-83 pl-4 px-4 py-2 bg-blue-600 text-white rounded shadow-lg z-50 font-bold"
-      style={{ minWidth: 100, zIndex: 1000, marginBottom: '80px' /* adjust if needed */ }}
-    >
-      {currentLang === 'hi' ? 'वापस' : 'Back'}
-    </button>
-  </div>
-);
+  // Fetch all cases
+  const { data: casesData, isLoading: loadingCases } = useQuery({
+    queryKey: ['cases'],
+    queryFn: fetchCases,
+  });
 
-const SubDepartmentData = ({ isLoggedIn = true }: { isLoggedIn?: boolean }) => {
+  if (loadingSubDepts || loadingCases) {
+    return (
+      <div className="flex items-center justify-center min-h-[300px]">
+        <div className="text-blue-600 text-lg font-semibold">
+          {currentLang === 'hi' ? 'लोड हो रहा है...' : 'Loading...'}
+        </div>
+      </div>
+    );
+  }
+
+  // Calculate stats for each sub-department
+  const subDepartmentStats = subDepartments?.map(subDept => {
+    const subDeptCases = casesData?.cases?.filter(c => 
+      c.subDepartment && c.subDepartment._id === subDept._id
+    ) || [];
+
+    return {
+      id: subDept._id,
+      name: currentLang === 'hi' ? subDept.name_hi : subDept.name_en,
+      total: subDeptCases.length,
+      pending: subDeptCases.filter(c => c.status === 'Pending').length,
+      resolved: subDeptCases.filter(c => c.status === 'Resolved').length,
+    };
+  }) || [];
+
   return (
     <div>
-      
-      <div className="overflow-x-auto p-4 font-bold">
+      <div className="flex justify-between items-center mb-6 px-4">
+        <h2 className="text-2xl font-bold text-gray-800">
+          {currentLang === 'hi' ? 'उप-विभाग रिपोर्ट' : 'Sub-Department Reports'}
+        </h2>
+        <button
+          onClick={onBack}
+          className="px-4 py-2 bg-blue-600 text-white rounded shadow-lg hover:bg-blue-700 transition-colors"
+        >
+          {currentLang === 'hi' ? 'वापस' : 'Back'}
+        </button>
+      </div>
+
+      <div className="overflow-x-auto p-4">
         <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
           <thead>
             <tr className="bg-blue-100 text-gray-800">
-              <th className="py-2 px-4 border-b font-bold">#</th>
-              <th className="py-2 px-4 border-b text-left font-bold">Department / Officer</th>
-              <th className="py-2 px-4 border-b text-blue-700 font-bold">Total Cases</th>
-              <th className="py-2 px-4 border-b text-yellow-600 font-bold">Pending Cases</th>
-              <th className="py-2 px-4 border-b text-green-700 font-bold">Resolved Cases</th>
+              <th className="py-3 px-4 border-b font-bold">#</th>
+              <th className="py-3 px-4 border-b text-left font-bold">
+                {currentLang === 'hi' ? 'उप-विभाग' : 'Sub-Department'}
+              </th>
+              <th className="py-3 px-4 border-b text-center text-blue-700 font-bold">
+                {currentLang === 'hi' ? 'कुल मामले' : 'Total Cases'}
+              </th>
+              <th className="py-3 px-4 border-b text-center text-yellow-600 font-bold">
+                {currentLang === 'hi' ? 'लंबित मामले' : 'Pending Cases'}
+              </th>
+              <th className="py-3 px-4 border-b text-center text-green-700 font-bold">
+                {currentLang === 'hi' ? 'निराकृत मामले' : 'Resolved Cases'}
+              </th>
             </tr>
           </thead>
           <tbody>
-            {caseData.map((item, index) => (
-              <tr key={item.id} className="hover:bg-gray-50">
-                <td className="py-2 px-4 border-b text-center font-bold">{index + 1}</td>
-                <td className="py-2 px-4 border-b font-bold">{item.name}</td>
-                <td className=" border-b text-center p-2 bg-blue-100  text-blue-700 font-bold ">{item.total}</td>
-                <td className=" border-b text-center p-2 bg-yellow-100 text-yellow-600 font-bold">{item.pending}</td>
-                <td className=" border-b text-center p-2 bg-green-100 text-green-700 font-bold">{item.resolved}</td>
+            {subDepartmentStats.map((item, index) => (
+              <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                <td className="py-3 px-4 border-b text-center font-semibold">{index + 1}</td>
+                <td className="py-3 px-4 border-b font-semibold">{item.name}</td>
+                <td className="py-3 px-4 border-b text-center bg-blue-50 text-blue-700 font-semibold">
+                  {item.total}
+                </td>
+                <td className="py-3 px-4 border-b text-center bg-yellow-50 text-yellow-600 font-semibold">
+                  {item.pending}
+                </td>
+                <td className="py-3 px-4 border-b text-center bg-green-50 text-green-700 font-semibold">
+                  {item.resolved}
+                </td>
               </tr>
             ))}
           </tbody>
