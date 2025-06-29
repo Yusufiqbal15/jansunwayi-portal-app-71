@@ -265,68 +265,74 @@ const AddCasePage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-jansunwayi-navy">{t.title}</h1>
-          <Button onClick={handleBackToCases} variant="outline">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">{t.title}</h1>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={handleBackToCases}
+            className="flex items-center gap-2"
+          >
             {t.backToCases}
           </Button>
         </div>
       </div>
 
       <Card className="p-6">
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Case Number */}
             <div>
-              <label className="block mb-1 font-medium">{t.caseNumber} *</label>
-              <input
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t.caseNumber}
+              </label>
+              <Input
                 type="text"
                 name="caseNumber"
                 value={formData.caseNumber}
                 onChange={handleChange}
-                required
-                className="input-field w-full"
-                placeholder={currentLang === 'hi' ? 'मामला संख्या दर्ज करें' : 'Enter case number'}
+                className="input-field"
               />
             </div>
 
             {/* Name */}
             <div>
-              <label className="block mb-1 font-medium">{t.name} *</label>
-              <input
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t.name}
+              </label>
+              <Input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                required
-                className="input-field w-full"
-                placeholder={currentLang === 'hi' ? 'नाम दर्ज करें' : 'Enter name'}
+                className="input-field"
               />
             </div>
 
             {/* Filing Date */}
             <div>
-              <label className="block mb-1 font-medium">{t.filingDate} *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t.filingDate}
+              </label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !formData.filingDate && "text-muted-foreground"
-                    )}
+                    className="w-full justify-start text-left font-normal"
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formData.filingDate ? format(formData.filingDate, "PPP") : t.selectDate}
+                    {formData.filingDate ? (
+                      format(formData.filingDate, "PPP")
+                    ) : (
+                      <span>{t.selectDate}</span>
+                    )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
+                <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={formData.filingDate}
-                    onSelect={(date) => setFormData(prev => ({ ...prev, filingDate: date }))}
+                    selected={formData.filingDate || undefined}
+                    onSelect={(date) => setFormData((prev) => ({ ...prev, filingDate: date }))}
                     initialFocus
                   />
                 </PopoverContent>
@@ -335,60 +341,60 @@ const AddCasePage: React.FC = () => {
 
             {/* Petition Number */}
             <div>
-              <label className="block mb-1 font-medium">{t.petitionNumber} *</label>
-              <input
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t.petitionNumber}
+              </label>
+              <Input
                 type="text"
                 name="petitionNumber"
                 value={formData.petitionNumber}
                 onChange={handleChange}
-                required
-                className="input-field w-full"
-                placeholder={currentLang === 'hi' ? 'रीट संख्या दर्ज करें' : 'Enter petition number'}
+                className="input-field"
               />
             </div>
 
             {/* Notice Number */}
             <div>
-              <label className="block mb-1 font-medium">{t.noticeNumber}</label>
-              <input
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t.noticeNumber}
+              </label>
+              <Input
                 type="text"
                 name="noticeNumber"
                 value={formData.noticeNumber}
                 onChange={handleChange}
-                className="input-field w-full"
-                placeholder={currentLang === 'hi' ? 'नोटिस संख्या दर्ज करें' : 'Enter notice number'}
+                className="input-field"
               />
             </div>
 
-            {/* Writ Type */}
+            {/* Writ Type - Changed to Input */}
             <div>
-              <label className="block mb-1 font-medium">{t.writType}</label>
-              <select
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t.writType}
+              </label>
+              <Input
+                type="text"
                 name="writType"
                 value={formData.writType}
                 onChange={handleChange}
-                className="input-field w-full"
-              >
-                <option value="">{t.selectWritType}</option>
-                <option value="writ">Writ</option>
-                <option value="pil">PIL</option>
-                <option value="civil">Civil</option>
-                <option value="criminal">Criminal</option>
-              </select>
+                className="input-field"
+                placeholder={currentLang === 'hi' ? 'रीट प्रकार दर्ज करें' : 'Enter writ type'}
+              />
             </div>
 
             {/* Department */}
             <div>
-              <label className="block mb-1 font-medium">{t.department} *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t.department}
+              </label>
               <select
                 name="department"
                 value={formData.department}
                 onChange={handleChange}
-                required
-                className="input-field w-full"
+                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
               >
                 <option value="">{t.selectDepartment}</option>
-                {departments.map(dept => (
+                {departments.map((dept) => (
                   <option key={dept.id} value={dept.id}>
                     {currentLang === 'hi' ? dept.name_hi : dept.name_en}
                   </option>
@@ -396,20 +402,22 @@ const AddCasePage: React.FC = () => {
               </select>
             </div>
 
-            {/* Sub-Department */}
+            {/* Sub Department */}
             <div>
-              <label className="block mb-1 font-medium">{t.subDepartment}</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t.subDepartment}
+              </label>
               <select
                 name="subDepartment"
                 value={formData.subDepartment}
                 onChange={handleChange}
-                className="input-field w-full"
+                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                 disabled={!formData.department}
               >
                 <option value="">{t.selectSubDepartment}</option>
-                {availableSubDepartments.map(subDept => (
-                  <option key={subDept._id || subDept.id} value={subDept._id || subDept.id}>
-                    {currentLang === 'hi' ? subDept.name_hi : subDept.name_en}
+                {availableSubDepartments.map((sub) => (
+                  <option key={sub._id || sub.id} value={sub._id || sub.id}>
+                    {currentLang === 'hi' ? sub.name_hi : sub.name_en}
                   </option>
                 ))}
               </select>
@@ -417,25 +425,28 @@ const AddCasePage: React.FC = () => {
 
             {/* Affidavit Due Date */}
             <div>
-              <label className="block mb-1 font-medium">{t.affidavitDueDate}</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t.affidavitDueDate}
+              </label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !formData.affidavitDueDate && "text-muted-foreground"
-                    )}
+                    className="w-full justify-start text-left font-normal"
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formData.affidavitDueDate ? format(formData.affidavitDueDate, "PPP") : t.selectDate}
+                    {formData.affidavitDueDate ? (
+                      format(formData.affidavitDueDate, "PPP")
+                    ) : (
+                      <span>{t.selectDate}</span>
+                    )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
+                <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={formData.affidavitDueDate}
-                    onSelect={(date) => setFormData(prev => ({ ...prev, affidavitDueDate: date }))}
+                    selected={formData.affidavitDueDate || undefined}
+                    onSelect={(date) => setFormData((prev) => ({ ...prev, affidavitDueDate: date }))}
                     initialFocus
                   />
                 </PopoverContent>
@@ -444,63 +455,59 @@ const AddCasePage: React.FC = () => {
 
             {/* Affidavit Submission Date */}
             <div>
-              <label className="block mb-1 font-medium">{t.affidavitSubmissionDate}</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t.affidavitSubmissionDate}
+              </label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !formData.affidavitSubmissionDate && "text-muted-foreground"
-                    )}
+                    className="w-full justify-start text-left font-normal"
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formData.affidavitSubmissionDate ? format(formData.affidavitSubmissionDate, "PPP") : t.selectDate}
+                    {formData.affidavitSubmissionDate ? (
+                      format(formData.affidavitSubmissionDate, "PPP")
+                    ) : (
+                      <span>{t.selectDate}</span>
+                    )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
+                <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={formData.affidavitSubmissionDate}
-                    onSelect={(date) => setFormData(prev => ({ ...prev, affidavitSubmissionDate: date }))}
+                    selected={formData.affidavitSubmissionDate || undefined}
+                    onSelect={(date) => setFormData((prev) => ({ ...prev, affidavitSubmissionDate: date }))}
                     initialFocus
                   />
                 </PopoverContent>
               </Popover>
             </div>
-          </div>
 
-          {/* Counter Affidavit Required */}
-          <div className="mt-6">
-            <label className="block mb-2 font-medium">{t.counterAffidavitinstruction}</label>
-            <div className="flex gap-4">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="counterAffidavitRequired"
-                  value="true"
-                  checked={formData.counterAffidavitRequired === true}
-                  onChange={() => setFormData(prev => ({ ...prev, counterAffidavitRequired: true }))}
-                  className="mr-2"
-                />
-                {t.yes}
+            {/* Counter Affidavit Required */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t.isthecounteraffidavittobefiledornot}
               </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="counterAffidavitRequired"
-                  value="false"
-                  checked={formData.counterAffidavitRequired === false}
-                  onChange={() => setFormData(prev => ({ ...prev, counterAffidavitRequired: false }))}
-                  className="mr-2"
-                />
-                {t.no}
-              </label>
+              <div className="flex space-x-4">
+                <Button
+                  type="button"
+                  variant={formData.counterAffidavitRequired ? 'default' : 'outline'}
+                  onClick={() => setFormData(prev => ({ ...prev, counterAffidavitRequired: true }))}
+                >
+                  {t.yes}
+                </Button>
+                <Button
+                  type="button"
+                  variant={!formData.counterAffidavitRequired ? 'default' : 'outline'}
+                  onClick={() => setFormData(prev => ({ ...prev, counterAffidavitRequired: false }))}
+                >
+                  {t.no}
+                </Button>
+              </div>
             </div>
           </div>
 
-          {/* Form Actions */}
-          <div className="flex justify-end gap-4 mt-8">
+          <div className="flex justify-end space-x-4 mt-6">
             <Button
               type="button"
               variant="outline"
@@ -510,13 +517,17 @@ const AddCasePage: React.FC = () => {
             </Button>
             <Button
               type="submit"
-              className="btn-primary"
               disabled={submitting}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              {submitting 
-                ? (currentLang === 'hi' ? 'सहेज रहा है...' : 'Saving...') 
-                : t.save
-              }
+              {submitting ? (
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  {currentLang === 'hi' ? 'सहेज रहा है...' : 'Saving...'}
+                </div>
+              ) : (
+                t.save
+              )}
             </Button>
           </div>
         </form>
