@@ -55,7 +55,8 @@ const AddCasePage: React.FC = () => {
     filingDate: Date | null;
     petitionNumber: string;
     noticeNumber: string;
-    writType: 'Regular' | 'Contempt' | '';
+    writType: 'Regular' | 'Contempt' | 'Custom' | '';
+    customWritType: string;
     department: string;
     subDepartment: string;
     affidavitDueDate: Date | null;
@@ -68,6 +69,7 @@ const AddCasePage: React.FC = () => {
     petitionNumber: '',
     noticeNumber: '',
     writType: '',
+    customWritType: '',
     department: '',
     subDepartment: '',
     affidavitDueDate: null,
@@ -101,7 +103,12 @@ const AddCasePage: React.FC = () => {
       yes: "Yes",
       no: "No",
       viewAllCases: "View All Cases",
-      backToCases: "Back to Cases"
+      backToCases: "Back to Cases",
+      customWritType: "Custom Writ Type",
+      customWritTypePlaceholder: "Enter custom writ type",
+      regular: "Regular",
+      contempt: "Contempt",
+      custom: "Custom"
     },
     hi: {
       title: "नया मामला जोड़ें",
@@ -128,7 +135,12 @@ const AddCasePage: React.FC = () => {
       yes: "हां",
       no: "नहीं",
       viewAllCases: "सभी मामले देखें",
-      backToCases: "मामलों पर वापस जाएं"
+      backToCases: "मामलों पर वापस जाएं",
+      customWritType: "कस्टम रीट प्रकार",
+      customWritTypePlaceholder: "कस्टम रीट प्रकार दर्ज करें",
+      regular: "नियमित",
+      contempt: "अवमानना",
+      custom: "कस्टम"
     }
   };
 
@@ -184,11 +196,18 @@ const AddCasePage: React.FC = () => {
       ...prev,
       [name]: value,
       ...(name === 'department' ? { subDepartment: '' } : {}),
+      ...(name === 'writType' && value !== 'Custom' ? { customWritType: '' } : {}),
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check if custom writ type is required but not provided
+    if (formData.writType === 'Custom' && !formData.customWritType.trim()) {
+      toast.error(currentLang === 'hi' ? 'कृपया कस्टम रीट प्रकार दर्ज करें' : 'Please enter custom writ type');
+      return;
+    }
 
     if (
       !formData.caseNumber ||
@@ -210,13 +229,16 @@ const AddCasePage: React.FC = () => {
         sub._id === formData.subDepartment || sub.id === parseInt(formData.subDepartment)
       );
       
+      // Determine the final writ type value
+      const finalWritType = formData.writType === 'Custom' ? formData.customWritType : formData.writType;
+      
       const caseData = {
         caseNumber: formData.caseNumber,
         name: formData.name,
         filingDate: formData.filingDate,
         petitionNumber: formData.petitionNumber,
         noticeNumber: formData.noticeNumber,
-        writType: formData.writType as 'Regular' | 'Contempt',
+        writType: finalWritType,
         department: parseInt(formData.department),
         subDepartment: selectedSubDept ? selectedSubDept._id || selectedSubDept.id : undefined,
         affidavitDueDate: formData.affidavitDueDate,
@@ -392,9 +414,24 @@ const AddCasePage: React.FC = () => {
                 className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
               >
                 <option value="">{t.selectWritType}</option>
-                <option value="Regular">Regular</option>
-                <option value="Contempt">Contempt</option>
+                <option value="Regular">{t.regular}</option>
+                <option value="Contempt">{t.contempt}</option>
+                <option value="Custom">{t.custom}</option>
               </select>
+              
+              {/* Custom Writ Type Input - Only show when Custom is selected */}
+              {formData.writType === 'Custom' && (
+                <div className="mt-2">
+                  <Input
+                    type="text"
+                    name="customWritType"
+                    placeholder={t.customWritTypePlaceholder}
+                    value={formData.customWritType}
+                    onChange={handleChange}
+                    className="input-field"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Department */}

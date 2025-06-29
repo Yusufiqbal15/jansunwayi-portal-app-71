@@ -35,7 +35,9 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage
       department: "Department",
       subDepartment: "Sub-Department",
       notifications: "Notifications",
-      upcomingHearing: "Upcoming Hearing"
+      upcomingHearing: "Upcoming Hearing",
+      departmentReport: "Department Report",
+      contemptCases: "Contempt Cases"
     },
     hi: {
       title: "डीएम जनसुनवाई पोर्टल",
@@ -49,7 +51,9 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage
       department: "विभाग",
       subDepartment: "उप-विभाग",
       notifications: "सूचनाएं",
-      upcomingHearing: "आगामी सुनवाई"
+      upcomingHearing: "आगामी सुनवाई",
+      departmentReport: "विभागीय रिपोर्ट",
+      contemptCases: "अवमानना मामले"
     }
   };
 
@@ -102,7 +106,15 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage
                             to="/reports"
                             className="block px-4 py-2 hover:bg-blue-500 hover:text-white transition-colors"
                           >
-                            Department Report
+                            {t.departmentReport}
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            to="/contempt-cases"
+                            className="block px-4 py-2 hover:bg-blue-500 hover:text-white transition-colors"
+                          >
+                            {t.contemptCases}
                           </Link>
                         </li>
                       </ul>

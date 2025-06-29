@@ -6,7 +6,7 @@ export interface Case {
   filingDate: Date;
   petitionNumber: string;
   noticeNumber: string;
-  writType: 'Regular' | 'Contempt'; // Specific type for writ types
+  writType: string; // Allow custom writ types
   department: number; // Department ID
   subDepartment?: number; // Sub-department ID
   status: 'Pending' | 'Resolved'; // Status

@@ -18,6 +18,7 @@ import AllCasesPage from '@/pages/AllCasesPage';
 import HomePage from '@/pages/HomePage';
 import CasesPage from '@/pages/CasesPage';
 import ReportsPage from './pages/ReportsPage';
+import ContemptCasesPage from './pages/ContemptCasesPage';
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
                 <Route path="all-cases/:subDepartmentId" element={<AllCasesPage />} />
                 <Route path="add-case" element={<AddCasePage />} />
                 <Route path="case/:id" element={<CaseDetailPage />} />
+                <Route path="contempt-cases" element={<ContemptCasesPage />} />
               </Route>
               <Route path="/" element={<HomePage />} />
               <Route path="/cases" element={<CasesPage />} />
