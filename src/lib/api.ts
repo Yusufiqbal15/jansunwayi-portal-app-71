@@ -28,6 +28,9 @@ let casesCache: any[] | null = null;
 let cacheTimestamp = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
+// Base URL for API calls
+const API_BASE = '/api';
+
 // ===== CASE API FUNCTIONS =====
 
 export const fetchCases = async (filters?: {
@@ -47,7 +50,9 @@ export const fetchCases = async (filters?: {
     if (filters?.page) params.append('page', filters.page.toString());
     if (filters?.limit) params.append('limit', filters.limit.toString());
 
-    const url = `http://localhost:5000/cases${params.toString() ? `?${params.toString()}` : ''}`;
+    const url = `${API_BASE}/cases${params.toString() ? `?${params.toString()}` : ''}`;
+    console.log('Fetching cases from URL:', url);
+    
     const response = await fetch(url);
     
     if (!response.ok) {
@@ -64,7 +69,7 @@ export const fetchCases = async (filters?: {
 
 export const fetchCaseById = async (id: string) => {
   try {
-    const response = await fetch(`http://localhost:5000/cases/${id}`);
+    const response = await fetch(`${API_BASE}/cases/${id}`);
     if (!response.ok) {
       throw new Error(`Error fetching case: ${response.statusText}`);
     }
@@ -77,7 +82,7 @@ export const fetchCaseById = async (id: string) => {
 
 export const createCase = async (caseData: Partial<Case>) => {
   try {
-    const response = await fetch('http://localhost:5000/cases', {
+    const response = await fetch(`${API_BASE}/cases`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -105,7 +110,7 @@ export const createCase = async (caseData: Partial<Case>) => {
 
 export const updateCase = async (id: string, caseData: Partial<Case>) => {
   try {
-    const response = await fetch(`http://localhost:5000/cases/${id}`, {
+    const response = await fetch(`${API_BASE}/cases/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -133,7 +138,7 @@ export const updateCase = async (id: string, caseData: Partial<Case>) => {
 
 export const deleteCase = async (id: string) => {
   try {
-    const response = await fetch(`http://localhost:5000/cases/${id}`, {
+    const response = await fetch(`${API_BASE}/cases/${id}`, {
       method: 'DELETE',
     });
     
@@ -159,7 +164,7 @@ export const saveSubDepartment = async (departmentId: number, subDeptNameEn: str
   try {
     console.log('API: Saving sub-department with data:', { departmentId, subDeptNameEn, subDeptNameHi });
     
-    const response = await fetch('http://localhost:5000/sub-departments', {
+    const response = await fetch(`${API_BASE}/sub-departments`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -205,8 +210,8 @@ export const fetchSubDepartments = async (departmentId?: number) => {
     const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
 
     const url = departmentId 
-      ? `http://localhost:5000/sub-departments?departmentId=${departmentId}`
-      : 'http://localhost:5000/sub-departments';
+      ? `${API_BASE}/sub-departments?departmentId=${departmentId}`
+      : `${API_BASE}/sub-departments`;
     
     console.log('API: Fetching from URL:', url);
     
@@ -241,7 +246,7 @@ export const fetchSubDepartments = async (departmentId?: number) => {
 
 export const updateSubDepartment = async (id: string, updateData: any) => {
   try {
-    const response = await fetch(`http://localhost:5000/sub-departments/${id}`, {
+    const response = await fetch(`${API_BASE}/sub-departments/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -269,7 +274,7 @@ export const updateSubDepartment = async (id: string, updateData: any) => {
 
 export const deleteSubDepartment = async (id: string) => {
   try {
-    const response = await fetch(`http://localhost:5000/sub-departments/${id}`, {
+    const response = await fetch(`${API_BASE}/sub-departments/${id}`, {
       method: 'DELETE',
     });
     
@@ -302,7 +307,7 @@ export const fetchDepartments = async () => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
 
-    const response = await fetch('http://localhost:5000/departments', { signal: controller.signal });
+    const response = await fetch(`${API_BASE}/departments`, { signal: controller.signal });
     clearTimeout(timeoutId);
     
     if (!response.ok) {
@@ -329,7 +334,7 @@ export const fetchDepartmentById = async (id: number) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
 
-    const response = await fetch(`http://localhost:5000/departments/${id}`, { signal: controller.signal });
+    const response = await fetch(`${API_BASE}/departments/${id}`, { signal: controller.signal });
     clearTimeout(timeoutId);
     
     if (!response.ok) {
@@ -344,7 +349,7 @@ export const fetchDepartmentById = async (id: number) => {
 
 export const createDepartment = async (departmentData: { id: number; name_en: string; name_hi: string }) => {
   try {
-    const response = await fetch('http://localhost:5000/departments', {
+    const response = await fetch(`${API_BASE}/departments`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -374,7 +379,7 @@ export const createDepartment = async (departmentData: { id: number; name_en: st
 
 export const sendEmailReminder = async (caseId: string, email: string) => {
   try {
-    const response = await fetch('http://localhost:5000/email-reminders', {
+    const response = await fetch(`${API_BASE}/email-reminders`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -396,7 +401,7 @@ export const sendEmailReminder = async (caseId: string, email: string) => {
 
 export const fetchEmailReminders = async (caseId: string) => {
   try {
-    const response = await fetch(`http://localhost:5000/email-reminders/case/${caseId}`);
+    const response = await fetch(`${API_BASE}/email-reminders/case/${caseId}`);
     if (!response.ok) {
       throw new Error(`Error fetching email reminders: ${response.statusText}`);
     }
@@ -411,7 +416,7 @@ export const fetchEmailReminders = async (caseId: string) => {
 
 export const fetchStatistics = async () => {
   try {
-    const response = await fetch('http://localhost:5000/statistics');
+    const response = await fetch(`${API_BASE}/statistics`);
     if (!response.ok) {
       throw new Error(`Error fetching statistics: ${response.statusText}`);
     }
@@ -426,7 +431,7 @@ export const fetchStatistics = async () => {
 
 export const seedData = async () => {
   try {
-    const response = await fetch('http://localhost:5000/seed-data', {
+    const response = await fetch(`${API_BASE}/seed-data`, {
       method: 'POST',
     });
     
