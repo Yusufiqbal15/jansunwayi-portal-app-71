@@ -90,7 +90,8 @@ const AllCasesPage: React.FC = () => {
       caseItem.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       caseItem.petitionNumber?.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesStatus = statusFilter === '' || caseItem.status === statusFilter;
+    const matchesStatus = statusFilter === '' || 
+      (statusFilter === 'Contempt' ? caseItem.writType === 'Contempt' : caseItem.status === statusFilter);
     
     return matchesSearch && matchesStatus;
   });
@@ -106,6 +107,7 @@ const AllCasesPage: React.FC = () => {
       allStatus: "All Status",
       pending: "Pending",
       resolved: "Resolved",
+      contempt: "Contempt",
       caseNumber: "Case Number",
       name: "Name",
       filingDate: "Filing Date",
@@ -117,7 +119,8 @@ const AllCasesPage: React.FC = () => {
       noCasesMessage: "No cases have been added for this sub-department yet.",
       totalCases: "Total Cases",
       pendingCases: "Pending Cases",
-      resolvedCases: "Resolved Cases"
+      resolvedCases: "Resolved Cases",
+      contemptCases: "Contempt Cases"
     },
     hi: {
       title: "सभी मामले",
@@ -129,6 +132,7 @@ const AllCasesPage: React.FC = () => {
       allStatus: "सभी स्थिति",
       pending: "लंबित",
       resolved: "निपटाया गया",
+      contempt: "अवमानना",
       caseNumber: "मामला संख्या",
       name: "नाम",
       filingDate: "दाखिल करने की तिथि",
@@ -140,7 +144,8 @@ const AllCasesPage: React.FC = () => {
       noCasesMessage: "इस उप-विभाग के लिए अभी तक कोई मामला नहीं जोड़ा गया है।",
       totalCases: "कुल मामले",
       pendingCases: "लंबित मामले",
-      resolvedCases: "निपटाए गए मामले"
+      resolvedCases: "निपटाए गए मामले",
+      contemptCases: "अवमानना मामले"
     }
   };
 
@@ -174,6 +179,7 @@ const AllCasesPage: React.FC = () => {
   const totalCases = cases.length;
   const pendingCases = cases.filter(c => c.status === 'Pending').length;
   const resolvedCases = cases.filter(c => c.status === 'Resolved').length;
+  const contemptCases = cases.filter(c => c.writType === 'Contempt').length;
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -201,7 +207,7 @@ const AllCasesPage: React.FC = () => {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <Card className="bg-jansunwayi-blue text-white">
           <div className="p-4 text-center">
             <h3 className="text-sm font-medium mb-1">{t.totalCases}</h3>
@@ -220,6 +226,13 @@ const AllCasesPage: React.FC = () => {
           <div className="p-4 text-center">
             <h3 className="text-sm font-medium mb-1">{t.resolvedCases}</h3>
             <p className="text-2xl font-bold">{resolvedCases}</p>
+          </div>
+        </Card>
+
+        <Card className="bg-purple-600 text-white">
+          <div className="p-4 text-center">
+            <h3 className="text-sm font-medium mb-1">{t.contemptCases}</h3>
+            <p className="text-2xl font-bold">{contemptCases}</p>
           </div>
         </Card>
       </div>
@@ -245,6 +258,7 @@ const AllCasesPage: React.FC = () => {
           <option value="">{t.allStatus}</option>
           <option value="Pending">{t.pending}</option>
           <option value="Resolved">{t.resolved}</option>
+          <option value="Contempt">{t.contempt}</option>
         </select>
         
         <Button

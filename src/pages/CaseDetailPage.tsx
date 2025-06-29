@@ -44,7 +44,7 @@ const getMockCase = (id: string) => {
     filingDate,
     petitionNumber: 'WP/12345/2025',
     noticeNumber: 'NT/789/2025',
-    writType: 'writ',
+    writType: 'Regular',
     department: '1',
     subDepartment: '',
     status: 'Pending',
@@ -82,10 +82,8 @@ const departments = [
 ];
 
 const writTypes = [
-  { value: 'writ', name_en: 'Writ', name_hi: 'रिट' },
-  { value: 'pil', name_en: 'PIL', name_hi: 'पीआईएल' },
-  { value: 'criminal', name_en: 'Criminal', name_hi: 'आपराधिक' },
-  { value: 'civil', name_en: 'Civil', name_hi: 'नागरिक' }
+  { value: 'Regular', name_en: 'Regular', name_hi: 'नियमित' },
+  { value: 'Contempt', name_en: 'Contempt', name_hi: 'अवमानना' }
 ];
 
 const CaseDetailPage: React.FC = () => {
@@ -284,8 +282,13 @@ const CaseDetailPage: React.FC = () => {
 
   if (!caseData) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-jansunwayi-blue"></div>
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-jansunwayi-blue"></div>
+          <span className="ml-3 text-jansunwayi-darkgray">
+            {currentLang === 'hi' ? 'डेटा लोड हो रहा है...' : 'Loading data...'}
+          </span>
+        </div>
       </div>
     );
   }
@@ -303,80 +306,52 @@ const CaseDetailPage: React.FC = () => {
   };
 
   const getWritTypeName = (value: string) => {
-    const type = writTypes.find(t => t.value === value);
-    return type ? (currentLang === 'hi' ? type.name_hi : type.name_en) : '';
+    const writType = writTypes.find(w => w.value === value);
+    return currentLang === 'hi' ? writType?.name_hi : writType?.name_en;
   };
 
+  const isContempt = caseData.writType === 'Contempt';
+
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-jansunwayi-navy mb-6">{t.title}</h1>
-
-      {/* Reminder Banner */}
-      {needsReminder && (
-        <div className="mb-6 reminder-card">
-          <div className="flex justify-between items-center">
-            <div>
-              <h3 className="font-semibold text-jansunwayi-red">
-                ⚠️ {t.hearingPending}
-              </h3>
-              <p>
-                {t.upcomingHearing}: {format(caseData.hearingDate, 'yyyy-MM-dd')}
-              </p>
-            </div>
-            <Button
-              onClick={sendReminder}
-              variant="destructive"
-            >
-              {t.sendReminder}
-            </Button>
-          </div>
-        </div>
-      )}
-
+    <div className="container mx-auto px-4 py-6">
       <Card className="p-6">
-        <div className="flex justify-end space-x-2 mb-6">
-          {!isEditing ? (
-            <>
-              <Button
-                onClick={() => setIsEditing(true)}
-                variant="outline"
-                size="sm"
-              >
-                <Edit className="mr-2 h-4 w-4" />
-                {t.edit}
-              </Button>
-              <Button
-                onClick={() => setShowDeleteDialog(true)}
-                variant="destructive"
-                size="sm"
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                {t.delete}
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                onClick={handleSave}
-                variant="default"
-                size="sm"
-              >
-                <Check className="mr-2 h-4 w-4" />
-                {t.save}
-              </Button>
-              <Button
-                onClick={() => {
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800">{t.title}</h1>
+            {caseData.writType === 'Contempt' && (
+              <span className="mt-2 px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
+                {currentLang === 'en' ? 'Contempt Case' : 'अवमानना मामला'}
+              </span>
+            )}
+          </div>
+          <div className="flex space-x-2">
+            {!isEditing ? (
+              <>
+                <Button onClick={() => setIsEditing(true)} variant="outline" className="flex items-center">
+                  <Edit className="h-4 w-4 mr-2" />
+                  {t.edit}
+                </Button>
+                <Button onClick={() => setShowDeleteDialog(true)} variant="destructive" className="flex items-center">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  {t.delete}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button onClick={handleSave} variant="default" className="flex items-center">
+                  <Check className="h-4 w-4 mr-2" />
+                  {t.save}
+                </Button>
+                <Button onClick={() => {
                   setIsEditing(false);
                   setEditedData(caseData);
-                }}
-                variant="outline"
-                size="sm"
-              >
-                <X className="mr-2 h-4 w-4" />
-                {t.cancel}
-              </Button>
-            </>
-          )}
+                }} variant="outline" className="flex items-center">
+                  <X className="h-4 w-4 mr-2" />
+                  {t.cancel}
+                </Button>
+              </>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -386,7 +361,7 @@ const CaseDetailPage: React.FC = () => {
               {t.caseNumber}
             </label>
             {isEditing ? (
-              <input
+              <Input
                 type="text"
                 name="caseNumber"
                 value={editedData.caseNumber}
@@ -394,9 +369,7 @@ const CaseDetailPage: React.FC = () => {
                 className="input-field"
               />
             ) : (
-              <div className="px-3 py-2 border border-gray-200 rounded-md bg-gray-50">
-                {caseData.caseNumber}
-              </div>
+              <div className="text-gray-900">{caseData.caseNumber}</div>
             )}
           </div>
 
@@ -406,7 +379,7 @@ const CaseDetailPage: React.FC = () => {
               {t.name}
             </label>
             {isEditing ? (
-              <input
+              <Input
                 type="text"
                 name="name"
                 value={editedData.name}
@@ -414,9 +387,7 @@ const CaseDetailPage: React.FC = () => {
                 className="input-field"
               />
             ) : (
-              <div className="px-3 py-2 border border-gray-200 rounded-md bg-gray-50">
-                {caseData.name}
-              </div>
+              <div className="text-gray-900">{caseData.name}</div>
             )}
           </div>
 
@@ -429,15 +400,14 @@ const CaseDetailPage: React.FC = () => {
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal"
+                    variant={"outline"}
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !editedData.filingDate && "text-muted-foreground"
+                    )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {editedData.filingDate ? (
-                      format(editedData.filingDate, "PPP")
-                    ) : (
-                      <span>{t.selectDate}</span>
-                    )}
+                    {editedData.filingDate ? format(editedData.filingDate, "PPP") : <span>{t.selectDate}</span>}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -446,13 +416,12 @@ const CaseDetailPage: React.FC = () => {
                     selected={editedData.filingDate}
                     onSelect={(date) => setEditedData((prev: any) => ({ ...prev, filingDate: date }))}
                     initialFocus
-                    className={cn("p-3 pointer-events-auto")}
                   />
                 </PopoverContent>
               </Popover>
             ) : (
-              <div className="px-3 py-2 border border-gray-200 rounded-md bg-gray-50">
-                {format(caseData.filingDate, 'yyyy-MM-dd')}
+              <div className="text-gray-900">
+                {format(caseData.filingDate, "PPP")}
               </div>
             )}
           </div>
@@ -507,16 +476,16 @@ const CaseDetailPage: React.FC = () => {
                 name="writType"
                 value={editedData.writType}
                 onChange={handleChange}
-                className="input-field"
+                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
               >
-                {writTypes.map((type) => (
+                {writTypes.map(type => (
                   <option key={type.value} value={type.value}>
                     {currentLang === 'hi' ? type.name_hi : type.name_en}
                   </option>
                 ))}
               </select>
             ) : (
-              <div className="px-3 py-2 border border-gray-200 rounded-md bg-gray-50">
+              <div className="text-gray-900">
                 {getWritTypeName(caseData.writType)}
               </div>
             )}

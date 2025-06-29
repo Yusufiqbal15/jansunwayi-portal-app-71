@@ -129,7 +129,9 @@ export const translations = {
     addNewCase: "Add New Case",
     subDepartments: "Sub Departments",
     viewSubDepartment: "View",
-    recentCases: "Recent Cases"
+    recentCases: "Recent Cases",
+    writType: "Writ Type",
+    contempt: "Contempt"
   },
   hi: {
     title: "विभागीय रिपोर्ट",
@@ -148,19 +150,32 @@ export const translations = {
     addNewCase: "नया मामला जोड़ें",
     subDepartments: "उप विभाग",
     viewSubDepartment: "देखें",
-    recentCases: "हाल के मामले"
+    recentCases: "हाल के मामले",
+    writType: "रीट प्रकार",
+    contempt: "अवमानना"
   }
 };
 
-export type CaseType = {
+export interface CaseType {
   id: string;
   date: Date;
   status: 'Pending' | 'Resolved';
   hearingDate: Date | null;
-  name: string;
-};
+  writType: string;
+}
 
-export type TranslationType = typeof translations.en;
+export interface TranslationType {
+  caseId: string;
+  date: string;
+  status: string;
+  hearingDate: string;
+  actions: string;
+  viewDetails: string;
+  pending: string;
+  resolved: string;
+  writType: string;
+  contempt: string;
+}
 
 // Firestore upload function
 export const uploadDepartmentsToFirestore = async (departments: any[]) => {

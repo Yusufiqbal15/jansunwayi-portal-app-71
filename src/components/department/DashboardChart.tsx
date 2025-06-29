@@ -59,14 +59,15 @@ const departments = [
 
 // Helper to get counts for each department from a list of cases
 function getDepartmentStats(deptId: number, cases: { cases: Case[] } | undefined) {
-  if (!cases) return { total: 0, pending: 0, resolved: 0 };
+  if (!cases) return { total: 0, pending: 0, resolved: 0, contempt: 0 };
 
   const casesArray = cases.cases || [];
   const deptCases = casesArray.filter(c => c.department === deptId);
   const total = deptCases.length;
   const pending = deptCases.filter(c => c.status === 'Pending').length;
   const resolved = deptCases.filter(c => c.status === 'Resolved').length;
-  return { total, pending, resolved };
+  const contempt = deptCases.filter(c => c.writType === 'Contempt').length;
+  return { total, pending, resolved, contempt };
 }
 
 type Props = {
@@ -84,8 +85,12 @@ const DashboardChart: React.FC<Props> = ({ currentLang }) => {
     staleTime: 5 * 60 * 1000, // Data is considered "fresh" for 5 minutes
   });
 
-  const handleClick = (departmentId: number, status: 'total' | 'pending' | 'resolved') => {
-    navigate(`/cases?department=${departmentId}&status=${status}`);
+  const handleClick = (departmentId: number, status: 'total' | 'pending' | 'resolved' | 'contempt') => {
+    if (status === 'contempt') {
+      navigate(`/cases?department=${departmentId}&writType=Contempt`);
+    } else {
+      navigate(`/cases?department=${departmentId}&status=${status}`);
+    }
   };
 
   // Show SubDepartmentData only for Administration Department (id: 1)
@@ -126,8 +131,11 @@ const DashboardChart: React.FC<Props> = ({ currentLang }) => {
             <th className="p-3 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-900 font-semibold">
               {currentLang === 'hi' ? 'लंबित' : 'Pending Cases'}
             </th>
-            <th className="p-3 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-900 font-semibold rounded-tr-lg">
+            <th className="p-3 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-900 font-semibold">
               {currentLang === 'hi' ? 'निराकृत' : 'Resolved Cases'}
+            </th>
+            <th className="p-3 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-900 font-semibold rounded-tr-lg">
+              {currentLang === 'hi' ? 'अवमानना मामले' : 'Contempt Cases'}
             </th>
           </tr>
         </thead>
@@ -139,8 +147,7 @@ const DashboardChart: React.FC<Props> = ({ currentLang }) => {
               <tr key={dept.id} className="transition-all duration-200 hover:scale-[1.01] hover:shadow-md hover:bg-blue-50">
                 <td className="p-3 text-center rounded-l-lg">{idx + 1}</td>
                 <td
-
-className="p-3 font-semibold cursor-pointer text-black hover:text-gray-800"
+                  className="p-3 font-semibold cursor-pointer text-black hover:text-gray-800"
                   role="button"
                   tabIndex={0}
                   onClick={() => setSelectedDeptId(dept.id)}
@@ -170,7 +177,7 @@ className="p-3 font-semibold cursor-pointer text-black hover:text-gray-800"
                   {stats.pending}
                 </td>
                 <td
-                  className="p-3 text-center font-bold text-green-700 bg-green-100 rounded-r-lg cursor-pointer hover:underline"
+                  className="p-3 text-center font-bold text-green-700 bg-green-100 rounded cursor-pointer hover:underline"
                   role="button"
                   tabIndex={0}
                   onClick={() => handleClick(dept.id, 'resolved')}
@@ -178,6 +185,16 @@ className="p-3 font-semibold cursor-pointer text-black hover:text-gray-800"
                   title={currentLang === 'hi' ? 'निराकृत मामले देखें' : 'View resolved cases'}
                 >
                   {stats.resolved}
+                </td>
+                <td
+                  className="p-3 text-center font-bold text-purple-700 bg-purple-100 rounded-r-lg cursor-pointer hover:underline"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleClick(dept.id, 'contempt')}
+                  onKeyPress={e => { if (e.key === 'Enter') handleClick(dept.id, 'contempt'); }}
+                  title={currentLang === 'hi' ? 'अवमानना मामले देखें' : 'View contempt cases'}
+                >
+                  {stats.contempt}
                 </td>
               </tr>
             );

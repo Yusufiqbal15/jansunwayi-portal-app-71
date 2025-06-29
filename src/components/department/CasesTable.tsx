@@ -64,6 +64,9 @@ const CasesTable: React.FC<CasesTableProps> = ({ cases, currentLang, t }) => {
                 {t.status}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {t.writType}
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 {t.hearingDate}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -74,6 +77,7 @@ const CasesTable: React.FC<CasesTableProps> = ({ cases, currentLang, t }) => {
           <tbody className="bg-white divide-y divide-gray-200">
             {cases.map((c) => {
               const needsReminder = c.status === 'Pending' && c.hearingDate && isWithinDays(c.hearingDate, 7);
+              const isContempt = c.writType === 'Contempt';
               
               return (
                 <tr key={c.id} className={needsReminder ? 'bg-red-50' : ''}>
@@ -93,6 +97,13 @@ const CasesTable: React.FC<CasesTableProps> = ({ cases, currentLang, t }) => {
                     }`}>
                       {currentLang === 'en' ? c.status : (c.status === 'Pending' ? t.pending : t.resolved)}
                     </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {isContempt && (
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
+                        {currentLang === 'en' ? 'Contempt' : 'अवमानना'}
+                      </span>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {c.hearingDate ? format(c.hearingDate, 'yyyy-MM-dd') : '-'}

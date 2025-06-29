@@ -49,17 +49,29 @@ const AddCasePage: React.FC = () => {
   const [subDepartments, setSubDepartments] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [submitting, setSubmitting] = useState<boolean>(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    caseNumber: string;
+    name: string;
+    filingDate: Date | null;
+    petitionNumber: string;
+    noticeNumber: string;
+    writType: 'Regular' | 'Contempt' | '';
+    department: string;
+    subDepartment: string;
+    affidavitDueDate: Date | null;
+    affidavitSubmissionDate: Date | null;
+    counterAffidavitRequired: boolean;
+  }>({
     caseNumber: '',
     name: '',
-    filingDate: null as Date | null,
+    filingDate: null,
     petitionNumber: '',
     noticeNumber: '',
     writType: '',
     department: '',
     subDepartment: '',
-    affidavitDueDate: null as Date | null,
-    affidavitSubmissionDate: null as Date | null,
+    affidavitDueDate: null,
+    affidavitSubmissionDate: null,
     counterAffidavitRequired: false,
   });
 
@@ -183,6 +195,7 @@ const AddCasePage: React.FC = () => {
       !formData.name ||
       !formData.filingDate ||
       !formData.petitionNumber ||
+      !formData.writType ||
       !formData.department
     ) {
       toast.error(t.validation);
@@ -203,13 +216,13 @@ const AddCasePage: React.FC = () => {
         filingDate: formData.filingDate,
         petitionNumber: formData.petitionNumber,
         noticeNumber: formData.noticeNumber,
-        writType: formData.writType,
+        writType: formData.writType as 'Regular' | 'Contempt',
         department: parseInt(formData.department),
-        subDepartment: selectedSubDept ? selectedSubDept._id : undefined, // Send the MongoDB ObjectId
+        subDepartment: selectedSubDept ? selectedSubDept._id || selectedSubDept.id : undefined,
         affidavitDueDate: formData.affidavitDueDate,
         affidavitSubmissionDate: formData.affidavitSubmissionDate,
         counterAffidavitRequired: formData.counterAffidavitRequired,
-        status: 'Pending'
+        status: 'Pending' as const
       };
 
       console.log('Submitting case data:', caseData);
@@ -367,19 +380,21 @@ const AddCasePage: React.FC = () => {
               />
             </div>
 
-            {/* Writ Type - Changed to Input */}
+            {/* Writ Type */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t.writType}
               </label>
-              <Input
-                type="text"
+              <select
                 name="writType"
                 value={formData.writType}
                 onChange={handleChange}
-                className="input-field"
-                placeholder={currentLang === 'hi' ? 'रीट प्रकार दर्ज करें' : 'Enter writ type'}
-              />
+                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+              >
+                <option value="">{t.selectWritType}</option>
+                <option value="Regular">Regular</option>
+                <option value="Contempt">Contempt</option>
+              </select>
             </div>
 
             {/* Department */}

@@ -6,7 +6,7 @@ export interface Case {
   filingDate: Date;
   petitionNumber: string;
   noticeNumber: string;
-  writType: string; // e.g., 'writ', 'pil'
+  writType: 'Regular' | 'Contempt'; // Specific type for writ types
   department: number; // Department ID
   subDepartment?: number; // Sub-department ID
   status: 'Pending' | 'Resolved'; // Status
@@ -37,6 +37,7 @@ export const fetchCases = async (filters?: {
   department?: number;
   subDepartment?: number;
   status?: string;
+  writType?: string;
   search?: string;
   page?: number;
   limit?: number;
@@ -46,6 +47,7 @@ export const fetchCases = async (filters?: {
     if (filters?.department) params.append('department', filters.department.toString());
     if (filters?.subDepartment) params.append('subDepartment', filters.subDepartment.toString());
     if (filters?.status) params.append('status', filters.status);
+    if (filters?.writType) params.append('writType', filters.writType);
     if (filters?.search) params.append('search', filters.search);
     if (filters?.page) params.append('page', filters.page.toString());
     if (filters?.limit) params.append('limit', filters.limit.toString());
@@ -80,7 +82,7 @@ export const fetchCaseById = async (id: string) => {
   }
 };
 
-export const createCase = async (caseData: Partial<Case>) => {
+export const createCase = async (caseData: Omit<Case, 'id' | 'hearingDate' | 'reminderSent' | 'reminderSentCount' | 'lastReminderSent' | 'createdAt' | 'updatedAt'>) => {
   try {
     const response = await fetch(`${API_BASE}/cases`, {
       method: 'POST',
