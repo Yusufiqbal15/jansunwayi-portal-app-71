@@ -170,6 +170,7 @@ export interface TranslationType {
   status: string;
   hearingDate: string;
   actions: string;
+  sendReminder: string;
   viewDetails: string;
   pending: string;
   resolved: string;

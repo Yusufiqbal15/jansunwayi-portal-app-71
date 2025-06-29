@@ -33,7 +33,9 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage
       noNotifications: "No notifications",
       clearAll: "Clear all",
       department: "Department",
-      subDepartment: "Sub-Department"
+      subDepartment: "Sub-Department",
+      notifications: "Notifications",
+      upcomingHearing: "Upcoming Hearing"
     },
     hi: {
       title: "डीएम जनसुनवाई पोर्टल",
@@ -45,7 +47,9 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage
       noNotifications: "कोई सूचना नहीं",
       clearAll: "सभी हटाएं",
       department: "विभाग",
-      subDepartment: "उप-विभाग"
+      subDepartment: "उप-विभाग",
+      notifications: "सूचनाएं",
+      upcomingHearing: "आगामी सुनवाई"
     }
   };
 
@@ -132,7 +136,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage
                   <PopoverContent className="w-80 p-0" align="end">
                     <div className="flex items-center justify-between p-4 border-b">
                       <h3 className="font-semibold text-gray-900">
-                        {currentLang === 'hi' ? 'सूचनाएं' : 'Notifications'}
+                        {t.notifications}
                       </h3>
                       {notifications.length > 0 && (
                         <Button
@@ -176,13 +180,13 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, currentLang, toggleLanguage
                                 {notification.message}
                               </p>
                               {notification.departmentName && (
-                                <div className="text-xs text-gray-500">
-                                  {t.department}: {notification.departmentName}
+                                <div className="text-xs text-gray-500 mb-1">
+                                  <span className="font-medium">{t.department}:</span> {notification.departmentName}
                                 </div>
                               )}
                               {notification.subDepartmentName && (
-                                <div className="text-xs text-gray-500">
-                                  {t.subDepartment}: {notification.subDepartmentName}
+                                <div className="text-xs text-gray-500 mb-1">
+                                  <span className="font-medium">{t.subDepartment}:</span> {notification.subDepartmentName}
                                 </div>
                               )}
                               <div className="text-xs text-gray-400 mt-1">
