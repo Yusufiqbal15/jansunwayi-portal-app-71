@@ -57,7 +57,7 @@ const LoginPage: React.FC = () => {
     }
 
     try {
-      login(email, password);
+      await login(email, password, 'admin');
       toast.success(t.loginSuccess);
       navigate('/reports'); // Redirect to reports page after successful login
     } catch (error) {

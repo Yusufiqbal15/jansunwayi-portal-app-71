@@ -25,14 +25,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setCurrentLang(currentLang === 'en' ? 'hi' : 'en');
   };
 
-  const login = (email: string, password: string, role: 'admin' | 'user') => {
-    // In a real application, we would validate credentials against a backend
-    // For this demo, we'll just set a mock user
-    setUser({
-      id: '1',
-      name: email.split('@')[0],
-      role,
-    });
+  const login = async (email: string, password: string, role: 'admin' | 'user') => {
+    if (role !== 'admin') throw new Error('Only admin login is supported');
+    try {
+      const res = await fetch('http://localhost:5000/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      if (!res.ok) {
+        throw new Error('Invalid credentials');
+      }
+      const data = await res.json();
+      setUser({ id: 'admin', name: data.email, role: 'admin' });
+    } catch (err) {
+      throw err;
+    }
   };
 
   const logout = () => {

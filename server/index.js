@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
+const bcrypt = require('bcryptjs');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -68,10 +69,18 @@ const emailReminderSchema = new mongoose.Schema({
   status: { type: String, enum: ['sent', 'failed'], default: 'sent' }
 });
 
+// Admin schema
+const adminSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now }
+});
+
 const Case = mongoose.model('Case', caseSchema);
 const Department = mongoose.model('Department', departmentSchema);
 const SubDepartment = mongoose.model('SubDepartment', subDepartmentSchema);
 const EmailReminder = mongoose.model('EmailReminder', emailReminderSchema);
+const Admin = mongoose.model('Admin', adminSchema);
 
 // Health check endpoint
 app.get('/', (req, res) => {
@@ -512,6 +521,45 @@ app.post('/seed-data', async (req, res) => {
   } catch (err) {
     console.error('Error seeding data:', err);
     res.status(500).json({ error: 'Failed to seed data' });
+  }
+});
+
+// Admin login endpoint
+app.post('/admin/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const admin = await Admin.findOne({ email });
+    if (!admin) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+    const isMatch = await bcrypt.compare(password, admin.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+    // For simplicity, just return success (no JWT/session)
+    res.json({ message: 'Login successful', email: admin.email });
+  } catch (err) {
+    console.error('Admin login error:', err);
+    res.status(500).json({ error: 'Failed to login' });
+  }
+});
+
+// Seed admin user endpoint (run once, then can be removed)
+app.post('/admin/seed', async (req, res) => {
+  try {
+    const email = 'admincourt@gmail.com';
+    const plainPassword = 'Admin@123';
+    let admin = await Admin.findOne({ email });
+    if (admin) {
+      return res.json({ message: 'Admin already exists' });
+    }
+    const hashedPassword = await bcrypt.hash(plainPassword, 10);
+    admin = new Admin({ email, password: hashedPassword });
+    await admin.save();
+    res.json({ message: 'Admin user created', email });
+  } catch (err) {
+    console.error('Admin seed error:', err);
+    res.status(500).json({ error: 'Failed to seed admin user' });
   }
 });
 
