@@ -57,7 +57,7 @@ const departments = [
   { id: 25, name_en: "Rural Engineering Department (R.E.D.)", name_hi: "ग्रामीण अभियंत्रण विभाग (आर०ई०डी०)" },
   { id: 26, name_en: "Saryu Canal Division", name_hi: "सरयू नहर खण्ड" },
   { id: 27, name_en: "Flood Works Division", name_hi: "बाढ़ कार्य खण्ड" },
-  { id: 28, name_en: "Groundwater Department", name_hi: "भूगर्भ जल विभाग"},
+  { id: 28, name_en: "Groundwater Department", name_hi: "भूगर्भ जल विभाग" },
   { id: 29, name_en: "Lift Irrigation Division", name_hi: "लिफ्ट सिंचाई खण्ड" },
   { id: 30, name_en: "Tubewell Construction Division", name_hi: "नलकूप निर्माण खण्ड" },
   { id: 31, name_en: "U.P. Jal Nigam Urban Construction Division", name_hi: "उ0 प्र0 जल निगम नगरीय निर्माण खण्ड" },

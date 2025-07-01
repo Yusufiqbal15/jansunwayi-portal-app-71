@@ -19,6 +19,7 @@ import HomePage from '@/pages/HomePage';
 import CasesPage from '@/pages/CasesPage';
 import ReportsPage from './pages/ReportsPage';
 import ContemptCasesPage from './pages/ContemptCasesPage';
+import DepartmentDashboardPage from './pages/DepartmentDashboardPage';
 
 const queryClient = new QueryClient();
 
@@ -34,17 +35,34 @@ const App = () => (
               <Route path="/" element={<Layout />}>
                 <Route index element={<LoginPage />} />
               </Route>
-              <Route path="/" element={<Layout requireAuth />}>
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="department/:id" element={<DepartmentPage />} />
-                <Route path="sub-department/:id" element={<SubDepartmentPage />} />
-                <Route path="sub-departments" element={<SubDepartmentsListPage />} />
-                <Route path="all-cases/:subDepartmentId" element={<AllCasesPage />} />
-                <Route path="add-case" element={<AddCasePage />} />
-                <Route path="case/:id" element={<CaseDetailPage />} />
-                <Route path="contempt-cases" element={<ContemptCasesPage />} />
+              <Route path="/dashboard" element={<Layout requireAuth />}>
+                <Route index element={<DashboardPage />} />
               </Route>
-              <Route path="/" element={<HomePage />} />
+              <Route path="/department/:id" element={<Layout requireAuth />}>
+                <Route index element={<DepartmentPage />} />
+              </Route>
+              <Route path="/sub-department/:id" element={<Layout requireAuth />}>
+                <Route index element={<SubDepartmentPage />} />
+              </Route>
+              <Route path="/sub-departments" element={<Layout requireAuth />}>
+                <Route index element={<SubDepartmentsListPage />} />
+              </Route>
+              <Route path="/all-cases/:subDepartmentId" element={<Layout requireAuth />}>
+                <Route index element={<AllCasesPage />} />
+              </Route>
+              <Route path="/add-case" element={<Layout requireAuth />}>
+                <Route index element={<AddCasePage />} />
+              </Route>
+              <Route path="/case/:id" element={<Layout requireAuth />}>
+                <Route index element={<CaseDetailPage />} />
+              </Route>
+              <Route path="/contempt-cases" element={<Layout requireAuth />}>
+                <Route index element={<ContemptCasesPage />} />
+              </Route>
+              <Route path="/department-dashboard/:departmentId" element={<Layout requireAuth />}>
+                <Route index element={<DepartmentDashboardPage />} />
+              </Route>
+              <Route path="/home" element={<HomePage />} />
               <Route path="/cases" element={<CasesPage />} />
               <Route path="/reports" element={<ReportsPage />} />
               <Route path="*" element={<NotFound />} />

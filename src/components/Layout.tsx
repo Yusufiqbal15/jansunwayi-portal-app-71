@@ -27,8 +27,7 @@ const Layout: React.FC<LayoutProps> = ({ requireAuth = false }) => {
       <main className="flex-1 container mx-auto px-20 py-6">
         <Outlet />
       </main>
-      <Footer currentLang={currentLang} 
-    />
+      <Footer currentLang={currentLang} />
     </div>
   );
 };

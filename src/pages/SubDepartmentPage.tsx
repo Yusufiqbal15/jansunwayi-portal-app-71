@@ -238,6 +238,13 @@ const SubDepartmentPage: React.FC = () => {
                         >
                           {currentLang === 'hi' ? 'अनुस्मारक' : 'Reminder'}
                         </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => navigate(`/case/${caseItem.id}`)}
+                        >
+                          {currentLang === 'hi' ? 'विवरण देखें' : 'View Details'}
+                        </Button>
                       </div>
                     </td>
                   </tr>

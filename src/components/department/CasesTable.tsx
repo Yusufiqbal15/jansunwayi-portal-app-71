@@ -110,11 +110,9 @@ const CasesTable: React.FC<CasesTableProps> = ({ cases, currentLang, t }) => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
-                      <Link to={`/case/${c.id}`}>
-                        <Button variant="outline" size="sm">
-                          {t.viewDetails}
-                        </Button>
-                      </Link>
+                      <Button size="sm" variant="outline" as={Link} to={`/case/${c.id}`}>
+                        View Details
+                      </Button>
                       
                       {needsReminder && (
                         <Button 

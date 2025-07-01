@@ -23,7 +23,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Input } from '@/components/ui/input';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { fetchCases } from '@/lib/api';
+import { fetchCases, deleteCase, updateCase } from '@/lib/api';
 
 // Mock data for demonstration
 const getMockCase = (id: string) => {
@@ -240,17 +240,29 @@ const CaseDetailPage: React.FC = () => {
     }));
   };
 
-  const handleSave = () => {
-    setCaseData(editedData);
-    setIsEditing(false);
-    toast.success(t.saved);
-    queryClient.invalidateQueries({ queryKey: ['cases'] });
+  const handleSave = async () => {
+    if (!id) return;
+    try {
+      await updateCase(id, editedData);
+      setCaseData(editedData);
+      setIsEditing(false);
+      toast.success(t.saved);
+      queryClient.invalidateQueries({ queryKey: ['cases'] });
+    } catch (error) {
+      toast.error(currentLang === 'hi' ? 'मामला अपडेट करने में त्रुटि हुई।' : 'Failed to update case.');
+    }
   };
 
-  const handleDelete = () => {
-    toast.success(t.deleted);
-    queryClient.invalidateQueries({ queryKey: ['cases'] });
-    navigate('/dashboard');
+  const handleDelete = async () => {
+    if (!id) return;
+    try {
+      await deleteCase(id);
+      toast.success(t.deleted);
+      queryClient.invalidateQueries({ queryKey: ['cases'] });
+      navigate('/dashboard');
+    } catch (error) {
+      toast.error(currentLang === 'hi' ? 'मामला हटाने में त्रुटि हुई।' : 'Failed to delete case.');
+    }
   };
 
   const sendReminder = async () => {
